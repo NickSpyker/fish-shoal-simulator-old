@@ -1,0 +1,12 @@
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT or Apache-2.0"
+authors = ["Nicolas Spijkerman <nicospijke@gmail.com>"]
+description = "Fish shoal simulator exploring emergent collective motion from simple local rules."
+
+[workspace]
+resolver = "3"
+members = ["src/fish-shoal-simulator", "src/fish-shoal-renderer", "src/fish-shoal-app"]
+
+[workspace.dependencies]

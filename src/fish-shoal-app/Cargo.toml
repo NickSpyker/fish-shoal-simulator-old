@@ -1,0 +1,13 @@
+[package]
+name = "fish-shoal-app"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description.workspace = true
+
+[[bin]]
+name = "fish-shoal"
+path = "src/main.rs"
+
+[dependencies]
