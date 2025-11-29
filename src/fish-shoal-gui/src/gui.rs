@@ -16,7 +16,7 @@
 
 use crate::{error::EFrameError, Error};
 use eframe::{
-    egui::{Context, ViewportBuilder}, epaint::{Color32, Pos2}, App,
+    egui::{CentralPanel, Context, Rect, SidePanel, Slider, Stroke, Vec2, ViewportBuilder}, epaint::{Color32, Pos2, StrokeKind}, App,
     Frame,
     NativeOptions,
 };
@@ -27,6 +27,7 @@ pub struct FishShoalGui {
     data_receiver: Receiver<SimulatorOutput>,
     config_sender: Sender<Config>,
     config: Config,
+    available_area: Vec2,
 }
 
 impl FishShoalGui {
@@ -35,6 +36,7 @@ impl FishShoalGui {
             data_receiver,
             config_sender,
             config: Config::default(),
+            available_area: Vec2::default(),
         }
     }
 
@@ -61,13 +63,58 @@ impl App for FishShoalGui {
             return;
         }
 
-        egui::CentralPanel::default().show(ctx, |ui| {
+        SidePanel::left("sidebar")
+            .default_width(200.0)
+            .show(ctx, |ui| {
+                ui.heading("Configuration");
+
+                ui.separator();
+
+                let mut width = self.config.width as u32;
+                let max_width = self.available_area.x as u32;
+                ui.add(Slider::new(&mut width, 100..=max_width).text("Width"));
+                self.config.width = width as usize;
+
+                let mut height = self.config.height as u32;
+                let max_height = self.available_area.y as u32;
+                ui.add(Slider::new(&mut height, 100..=max_height).text("Height"));
+                self.config.height = height as usize;
+
+                ui.separator();
+
+                let mut nb_entities = self.config.nb_entities as u32;
+                ui.add(Slider::new(&mut nb_entities, 0..=250_000).text("Entities"));
+                self.config.nb_entities = nb_entities as usize;
+            });
+
+        CentralPanel::default().show(ctx, |ui| {
             let rect = ui.max_rect();
+            self.available_area = rect.size();
+
             let painter = ui.painter_at(rect);
+
+            let margin_hor: f32 = (self.available_area.x - self.config.width as f32) / 2.0;
+            let margin_ver: f32 = (self.available_area.y - self.config.height as f32) / 2.0;
+            let top_left = Pos2::new(rect.min.x + margin_hor, rect.min.y + margin_ver);
+            let config_rect = Rect::from_min_size(
+                top_left,
+                Vec2::new(self.config.width as f32, self.config.height as f32),
+            );
+
+            let origin = config_rect.left_top();
+
+            painter.rect_stroke(
+                config_rect,
+                0.0,
+                Stroke::new(1.0, Color32::WHITE),
+                StrokeKind::Middle,
+            );
 
             if let Ok(output) = self.data_receiver.recv() {
                 for position in &output.positions {
-                    painter.circle_filled(Pos2::new(position.x, position.y), 2.0, Color32::RED);
+                    let screen_x = origin.x + position.x;
+                    let screen_y = origin.y + position.y;
+                    painter.circle_filled(Pos2::new(screen_x, screen_y), 2.0, Color32::BLUE);
                 }
             }
         });

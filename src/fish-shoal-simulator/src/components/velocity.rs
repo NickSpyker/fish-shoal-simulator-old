@@ -35,8 +35,8 @@ impl Velocity {
     pub fn new_random() -> Self {
         let mut rng: ThreadRng = rand::rng();
 
-        let dx: f32 = rng.random_range(0.0..=1.0);
-        let dy: f32 = rng.random_range(0.0..=1.0);
+        let dx: f32 = rng.random_range(-1.0..=1.0);
+        let dy: f32 = rng.random_range(-1.0..=1.0);
 
         Self::new(dx, dy).normalized()
     }
