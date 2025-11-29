@@ -15,6 +15,7 @@
  */
 
 use std::{
+    any::Any,
     error,
     fmt::{Display, Formatter},
 };
@@ -23,6 +24,7 @@ use std::{
 pub enum Error {
     EFrame(eframe::Error),
     Simulator(fish_shoal_simulator::Error),
+    Thread(Box<dyn Any + Send + 'static>),
 }
 
 impl Display for Error {
@@ -33,6 +35,7 @@ impl Display for Error {
             match self {
                 Self::EFrame(source) => format!("eframe: {source}"),
                 Self::Simulator(source) => format!("simulator: {source}"),
+                Self::Thread(source) => format!("thread: {:?}", source),
             }
         )
     }
@@ -43,6 +46,7 @@ impl error::Error for Error {
         match self {
             Self::EFrame(source) => Some(source),
             Self::Simulator(source) => Some(source),
+            Self::Thread(_) => None,
         }
     }
 }

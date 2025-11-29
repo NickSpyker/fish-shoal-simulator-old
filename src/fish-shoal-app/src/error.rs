@@ -14,23 +14,4 @@
  * limitations under the License.
  */
 
-#[derive(Debug, Eq, PartialEq, Copy, Clone)]
-pub struct Config {
-    pub is_running: bool,
-    pub width: usize,
-    pub height: usize,
-    pub nb_entities: usize,
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            is_running: true,
-            width: 100,
-            height: 100,
-            nb_entities: 100,
-        }
-    }
-}
-
-impl Config {}
+pub type Error = fish_shoal_gui::Error;

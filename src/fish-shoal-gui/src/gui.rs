@@ -20,21 +20,23 @@ use eframe::{
     Frame,
     NativeOptions,
 };
-use fish_shoal_simulator::Position;
+use fish_shoal_simulator::{Config, SimulatorOutput};
+use std::sync::mpsc::{Receiver, Sender};
 
-#[derive(Default)]
 pub struct FishShoalGui {
-    positions: Vec<Position>,
+    sim_data: Receiver<SimulatorOutput>,
+    sim_config: Sender<Config>,
 }
 
 impl FishShoalGui {
-    pub fn new() -> Self {
+    pub fn new(sim_data: Receiver<SimulatorOutput>, sim_config: Sender<Config>) -> Self {
         Self {
-            positions: Vec::new(),
+            sim_data,
+            sim_config,
         }
     }
 
-    pub fn run(&self) -> Result<(), Error> {
+    pub fn run(self) -> Result<(), Error> {
         eframe::run_native(
             "Fish Shoal Simulator",
             NativeOptions {
@@ -45,7 +47,7 @@ impl FishShoalGui {
                 centered: true,
                 ..Default::default()
             },
-            Box::new(|_| Ok(Box::new(Self::new()))),
+            Box::new(|_| Ok(Box::new(self))),
         )
         .map_err(|err| Error::EFrame(err))
     }
@@ -57,8 +59,10 @@ impl App for FishShoalGui {
             let rect = ui.max_rect();
             let painter = ui.painter_at(rect);
 
-            for position in &self.positions {
-                painter.circle_filled(Pos2::new(position.x, position.y), 2.0, Color32::RED);
+            if let Some(output) = self.sim_data.iter().last() {
+                for position in &output.positions {
+                    painter.circle_filled(Pos2::new(position.x, position.y), 2.0, Color32::RED);
+                }
             }
         });
 

@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{
-    Config, DeltaTime, Fish, Error, Position, SimulatorOutput, SystemBundle,
-};
+use crate::{Config, DeltaTime, Error, Fish, Position, SimulatorOutput, SystemBundle};
 use shipyard::{IntoIter, View, World};
 use std::cmp::Ordering;
 
@@ -27,14 +25,13 @@ pub struct FishShoalSimulator {
 }
 
 impl FishShoalSimulator {
-    pub fn new(config: Config) -> Result<Self, Error> {
+    pub fn new() -> Result<Self, Error> {
         let world = World::new();
-        SystemBundle::build(&world)
-            .map_err(|err| Error::Create(err.to_string()))?;
+        SystemBundle::build(&world).map_err(|err| Error::Create(err.to_string()))?;
         world.add_unique(DeltaTime::new());
         Ok(Self {
             entities: world,
-            config,
+            config: Config::default(),
         })
     }
 
@@ -62,12 +59,11 @@ impl FishShoalSimulator {
         }
     }
 
-    pub fn run(
-        &mut self,
-        io: fn(input: SimulatorOutput) -> Config,
-    ) -> Result<(), Error> {
-        SystemBundle::run(&self.entities)
-            .map_err(|err| Error::Run(err.to_string()))?;
+    pub fn run<F>(&mut self, mut io: F) -> Result<(), Error>
+    where
+        F: FnMut(SimulatorOutput) -> Config + 'static,
+    {
+        SystemBundle::run(&self.entities).map_err(|err| Error::Run(err.to_string()))?;
         let mut config = Config::default();
         self.entities.run(|positions: View<Position>| {
             config = io(SimulatorOutput {
