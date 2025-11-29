@@ -19,6 +19,9 @@ mod error;
 
 use app::FishShoalApp;
 
-fn main() -> Result<(), error::Error> {
-    FishShoalApp::new().run()
+fn main() {
+    match FishShoalApp::new().run() {
+        Ok(_) => println!("Fish Shoal exited successfully"),
+        Err(err) => eprintln!("{err}"),
+    }
 }

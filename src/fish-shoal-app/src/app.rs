@@ -67,7 +67,7 @@ impl FishShoalApp {
             Ok(())
         });
 
-        gui.run()?;
+        gui.run().map_err(Error::Gui)?;
         sim_thread.join().map_err(Error::Thread)?
     }
 }

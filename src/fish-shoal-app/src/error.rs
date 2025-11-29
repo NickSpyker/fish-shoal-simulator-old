@@ -14,4 +14,43 @@
  * limitations under the License.
  */
 
-pub type Error = fish_shoal_gui::Error;
+use std::{
+    any::Any,
+    error,
+    fmt::{Display, Formatter},
+    sync::mpsc::RecvError,
+};
+
+#[derive(Debug)]
+pub enum Error {
+    Gui(fish_shoal_gui::Error),
+    Simulator(fish_shoal_simulator::Error),
+    Thread(Box<dyn Any + Send + 'static>),
+    Receiver(RecvError),
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Fish Shoal App error caused by {}",
+            match self {
+                Self::Gui(source) => format!("GUI: {source}"),
+                Self::Simulator(source) => format!("Simulator: {source}"),
+                Self::Thread(source) => format!("thread: {:?}", source),
+                Self::Receiver(source) => format!("receiver: {source}"),
+            }
+        )
+    }
+}
+
+impl error::Error for Error {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        match self {
+            Self::Gui(source) => Some(source),
+            Self::Simulator(source) => Some(source),
+            Self::Thread(_) => None,
+            Self::Receiver(source) => Some(source),
+        }
+    }
+}
