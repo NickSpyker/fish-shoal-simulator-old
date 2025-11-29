@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::Error;
+use crate::{error::EFrameError, Error};
 use eframe::{
     egui::{Context, ViewportBuilder}, epaint::{Color32, Pos2}, App,
     Frame,
@@ -49,7 +49,7 @@ impl FishShoalGui {
             },
             Box::new(|_| Ok(Box::new(self))),
         )
-        .map_err(|err| Error::EFrame(err))
+        .map_err(|err| Error::EFrame(EFrameError(err.to_string())))
     }
 }
 

@@ -45,7 +45,7 @@ impl FishShoalApp {
         let mut sim = FishShoalSimulator::new().map_err(Error::Simulator)?;
         let gui = FishShoalGui::new(self.sim_data_receiver, self.sim_config_sender);
 
-        let sim_thread: JoinHandle<Result<(), ()>> = thread::spawn(move || {
+        let sim_thread: JoinHandle<Result<(), Error>> = thread::spawn(move || {
             let data_sender = self.sim_data_sender;
             let config_receiver = self.sim_config_receiver;
 
@@ -53,22 +53,21 @@ impl FishShoalApp {
             while is_running {
                 let data_sender = data_sender.clone();
 
-                let config: Config = config_receiver.recv().unwrap();
+                let config: Config = config_receiver.recv().map_err(Error::Receiver)?;
                 is_running = config.is_running;
 
                 sim.run(move |output: SimulatorOutput| {
-                    data_sender.send(output).unwrap();
+                    data_sender
+                        .send(output)
+                        .expect("Fish Shoal App crash caused by simulator data sender");
                     config
                 })
-                .map_err(Error::Simulator)
-                .unwrap();
+                .map_err(Error::Simulator)?;
             }
             Ok(())
         });
 
         gui.run()?;
-        sim_thread.join().map_err(Error::Thread)?;
-
-        Ok(())
+        sim_thread.join().map_err(Error::Thread)?
     }
 }

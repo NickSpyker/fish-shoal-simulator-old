@@ -18,13 +18,15 @@ use std::{
     any::Any,
     error,
     fmt::{Display, Formatter},
+    sync::mpsc::RecvError,
 };
 
 #[derive(Debug)]
 pub enum Error {
-    EFrame(eframe::Error),
+    EFrame(EFrameError),
     Simulator(fish_shoal_simulator::Error),
     Thread(Box<dyn Any + Send + 'static>),
+    Receiver(RecvError),
 }
 
 impl Display for Error {
@@ -36,6 +38,7 @@ impl Display for Error {
                 Self::EFrame(source) => format!("eframe: {source}"),
                 Self::Simulator(source) => format!("simulator: {source}"),
                 Self::Thread(source) => format!("thread: {:?}", source),
+                Self::Receiver(source) => format!("receiver: {source}"),
             }
         )
     }
@@ -47,6 +50,18 @@ impl error::Error for Error {
             Self::EFrame(source) => Some(source),
             Self::Simulator(source) => Some(source),
             Self::Thread(_) => None,
+            Self::Receiver(source) => Some(source),
         }
     }
 }
+
+#[derive(Debug)]
+pub struct EFrameError(pub String);
+
+impl Display for EFrameError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl error::Error for EFrameError {}
