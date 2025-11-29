@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-use crate::{error::EFrameError, Error};
+use crate::components::Simulation;
+use crate::{error::EFrameError, Error, SideBar, UiComponent};
 use eframe::{
-    egui::{CentralPanel, Context, Rect, SidePanel, Slider, Stroke, Vec2, ViewportBuilder}, epaint::{Color32, Pos2, StrokeKind}, App,
-    Frame,
-    NativeOptions,
+    egui::{Context, Vec2, ViewportBuilder}, App, Frame,
+    NativeOptions
+    ,
 };
 use fish_shoal_simulator::{Config, SimulatorOutput};
 use std::sync::mpsc::{Receiver, Sender};
 
 pub struct FishShoalGui {
-    data_receiver: Receiver<SimulatorOutput>,
-    config_sender: Sender<Config>,
+    pub data_receiver: Receiver<SimulatorOutput>,
+    pub config_sender: Sender<Config>,
+    pub config: Config,
+    pub available_area: Vec2,
     initialized: bool,
-    config: Config,
-    available_area: Vec2,
 }
 
 impl FishShoalGui {
@@ -36,9 +37,9 @@ impl FishShoalGui {
         Self {
             data_receiver,
             config_sender,
-            initialized: false,
             config: Config::default(),
             available_area: Vec2::default(),
+            initialized: false,
         }
     }
 
@@ -60,66 +61,13 @@ impl FishShoalGui {
 }
 
 impl App for FishShoalGui {
-    fn update(&mut self, ctx: &Context, _: &mut Frame) {
+    fn update(&mut self, ctx: &Context, frame: &mut Frame) {
         if self.config_sender.send(self.config).is_err() {
             return;
         }
 
-        SidePanel::left("sidebar")
-            .default_width(200.0)
-            .show(ctx, |ui| {
-                ui.heading("Configuration");
-
-                ui.separator();
-
-                let mut width = self.config.width as u32;
-                let max_width = self.available_area.x as u32;
-                ui.add(Slider::new(&mut width, 100..=max_width).text("Width"));
-                self.config.width = width as usize;
-
-                let mut height = self.config.height as u32;
-                let max_height = self.available_area.y as u32;
-                ui.add(Slider::new(&mut height, 100..=max_height).text("Height"));
-                self.config.height = height as usize;
-
-                ui.separator();
-
-                let mut nb_entities = self.config.nb_entities as u32;
-                ui.add(Slider::new(&mut nb_entities, 0..=250_000).text("Entities"));
-                self.config.nb_entities = nb_entities as usize;
-            });
-
-        CentralPanel::default().show(ctx, |ui| {
-            let rect = ui.max_rect();
-            self.available_area = rect.size();
-
-            let painter = ui.painter_at(rect);
-
-            let margin_hor: f32 = (self.available_area.x - self.config.width as f32) / 2.0;
-            let margin_ver: f32 = (self.available_area.y - self.config.height as f32) / 2.0;
-            let top_left = Pos2::new(rect.min.x + margin_hor, rect.min.y + margin_ver);
-            let config_rect = Rect::from_min_size(
-                top_left,
-                Vec2::new(self.config.width as f32, self.config.height as f32),
-            );
-
-            let origin = config_rect.left_top();
-
-            painter.rect_stroke(
-                config_rect,
-                0.0,
-                Stroke::new(1.0, Color32::WHITE),
-                StrokeKind::Middle,
-            );
-
-            if let Ok(output) = self.data_receiver.recv() {
-                for position in &output.positions {
-                    let screen_x = origin.x + position.x;
-                    let screen_y = origin.y + position.y;
-                    painter.circle_filled(Pos2::new(screen_x, screen_y), 2.0, Color32::BLUE);
-                }
-            }
-        });
+        SideBar::render(self, ctx, frame);
+        Simulation::render(self, ctx, frame);
 
         if !self.initialized {
             self.config.width = self.available_area.x as usize;

@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-use crate::{Position, Speed, Velocity};
+mod sidebar;
+mod simulation;
 
-#[derive(Debug, Default)]
-pub struct SimulatorOutput {
-    pub positions: Vec<Position>,
-    pub velocities: Vec<Velocity>,
-    pub speeds: Vec<Speed>,
+pub use sidebar::SideBar;
+pub use simulation::Simulation;
+
+use crate::FishShoalGui;
+use eframe::{egui::Context, Frame};
+
+pub trait UiComponent {
+    fn render(app: &mut FishShoalGui, ctx: &Context, frame: &mut Frame);
 }
-
-impl SimulatorOutput {}

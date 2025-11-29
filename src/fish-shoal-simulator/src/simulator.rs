@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-use crate::{Area, Config, DeltaTime, Error, Fish, Position, SimulatorOutput, SystemBundle};
+use crate::{
+    Area, Config, DeltaTime, Error, Fish, Position, SimulatorOutput, Speed, SystemBundle, Velocity,
+};
 use shipyard::{IntoIter, UniqueViewMut, View, World};
 use std::cmp::Ordering;
 
@@ -74,11 +76,15 @@ impl FishShoalSimulator {
     {
         SystemBundle::run(&self.entities).map_err(|err| Error::Run(err.to_string()))?;
         let mut config = Config::default();
-        self.entities.run(|positions: View<Position>| {
-            config = io(SimulatorOutput {
-                positions: positions.iter().map(|&position| position).collect(),
-            });
-        });
+        self.entities.run(
+            |positions: View<Position>, velocities: View<Velocity>, speeds: View<Speed>| {
+                config = io(SimulatorOutput {
+                    positions: positions.iter().map(|&position| position).collect(),
+                    velocities: velocities.iter().map(|&position| position).collect(),
+                    speeds: speeds.iter().map(|&position| position).collect(),
+                });
+            },
+        );
         if config != self.config {
             self.setup(config);
         }

@@ -16,6 +16,11 @@
 
 mod error;
 mod gui;
+mod utils;
+mod components;
 
 pub use error::Error;
 pub use gui::FishShoalGui;
+pub use utils::Utils;
+
+pub(crate) use components::*;

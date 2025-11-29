@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-use crate::{Position, Speed, Velocity};
+use eframe::epaint::Color32;
 
-#[derive(Debug, Default)]
-pub struct SimulatorOutput {
-    pub positions: Vec<Position>,
-    pub velocities: Vec<Velocity>,
-    pub speeds: Vec<Speed>,
+pub struct Utils;
+
+impl Utils {
+    pub fn speed_to_color(speed: f32) -> Color32 {
+        let s: f32 = speed.clamp(0.0, 100.0) / 100.0;
+
+        let r: u8 = (255.0 * s) as u8;
+        let g: u8 = 0u8;
+        let b: u8 = (255.0 * (1.0 - s)) as u8;
+
+        Color32::from_rgb(r, g, b)
+    }
 }
-
-impl SimulatorOutput {}
