@@ -34,11 +34,8 @@ impl SystemBundle {
             .with_system(CalculateDeltaTime::system)
             .with_barrier()
             .with_system(Motion::system)
-            .with_barrier()
             .with_system(OutOfBound::system)
-            .with_barrier()
             .with_system(LerpToTarget::system)
-            .with_barrier()
             .with_system(RandomBehavior::system)
             .add_to_world(&world)
     }
