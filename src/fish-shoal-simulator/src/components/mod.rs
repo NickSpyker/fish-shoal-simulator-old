@@ -15,13 +15,10 @@
  */
 
 mod alignment_radius;
-mod area;
 mod attraction_radius;
 mod blind_spot;
 mod collision_radius;
-mod delta_time;
-mod idle;
-mod is_fish;
+mod fish_identifier;
 mod position;
 mod speed;
 mod stress;
@@ -30,10 +27,7 @@ mod target_velocity;
 mod velocity;
 mod wiggle;
 
-pub use area::Area;
-pub use delta_time::DeltaTime;
-pub use idle::Idle;
-pub use is_fish::IsFish;
+pub use fish_identifier::FishIdentifier;
 pub use position::Position;
 pub use speed::Speed;
 pub use stress::Stress;

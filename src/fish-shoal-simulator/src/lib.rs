@@ -15,7 +15,6 @@
  */
 
 mod components;
-mod config;
 mod entities;
 mod error;
 mod simulator;
@@ -23,15 +22,16 @@ mod simulator_output;
 mod system_bundle;
 mod systems;
 mod types;
+mod uniques;
 
 pub use components::{
-    Area, DeltaTime, Idle, IsFish, Position, Speed, Stress, TargetSpeed, TargetVelocity, Velocity,
+    FishIdentifier, Position, Speed, Stress, TargetSpeed, TargetVelocity, Velocity,
 };
-pub use config::Config;
 pub use error::Error;
 pub use simulator::FishShoalSimulator;
 pub use simulator_output::SimulatorOutput;
 pub use types::{Angle, Radius, Vec2};
+pub use uniques::{Config, DeltaTime};
 
 pub(crate) use entities::*;
 pub(crate) use system_bundle::SystemBundle;

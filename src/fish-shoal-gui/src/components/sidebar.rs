@@ -31,9 +31,9 @@ impl UiComponent for SideBar {
 
                 ui.separator();
 
-                let mut nb_entities = app.config.nb_entities as u32;
+                let mut nb_entities = app.config.entity_count as u32;
                 ui.add(Slider::new(&mut nb_entities, 0..=10_000).text("Entities"));
-                app.config.nb_entities = nb_entities as usize;
+                app.config.entity_count = nb_entities as usize;
 
                 ui.separator();
 
@@ -51,29 +51,29 @@ impl UiComponent for SideBar {
 
                 ui.heading(RichText::new("Idle behavior change probability").size(14.0));
 
-                let mut change_dir_proba = app.config.chance_to_change_direction * 100.0;
+                let mut change_dir_proba = app.config.direction_change_prob * 100.0;
                 ui.add(
                     Slider::new(&mut change_dir_proba, 0.0..=100.0)
                         .suffix(" %")
                         .text("Direction"),
                 );
-                app.config.chance_to_change_direction = change_dir_proba / 100.0;
+                app.config.direction_change_prob = change_dir_proba / 100.0;
 
-                let mut change_speed_proba = app.config.chance_to_change_speed * 100.0;
+                let mut change_speed_proba = app.config.speed_change_prob * 100.0;
                 ui.add(
                     Slider::new(&mut change_speed_proba, 0.0..=100.0)
                         .suffix(" %")
                         .text("Speed"),
                 );
-                app.config.chance_to_change_speed = change_speed_proba / 100.0;
+                app.config.speed_change_prob = change_speed_proba / 100.0;
 
-                let mut change_stress_proba = app.config.chance_to_change_stress * 100.0;
+                let mut change_stress_proba = app.config.stress_change_prob * 100.0;
                 ui.add(
                     Slider::new(&mut change_stress_proba, 0.0..=100.0)
                         .suffix(" %")
                         .text("Stress"),
                 );
-                app.config.chance_to_change_stress = change_stress_proba / 100.0;
+                app.config.stress_change_prob = change_stress_proba / 100.0;
             });
     }
 }

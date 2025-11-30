@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{IsFish, Position, Speed, Stress, TargetSpeed, TargetVelocity, Velocity};
+use crate::{FishIdentifier, Position, Speed, Stress, TargetSpeed, TargetVelocity, Velocity};
 use rand::{rngs::ThreadRng, seq::SliceRandom};
 use shipyard::{EntityId, IntoIter, View, World};
 
@@ -24,7 +24,7 @@ impl Fish {
     pub fn add(world: &mut World, amount: usize, area_width: usize, area_height: usize) {
         for _ in 0..amount {
             world.add_entity((
-                IsFish,
+                FishIdentifier,
                 Position::new_random(0.0, area_width as f32, 0.0, area_height as f32),
                 Velocity::new(),
                 TargetVelocity::new(),
@@ -36,7 +36,7 @@ impl Fish {
     }
 
     pub fn remove(world: &mut World, amount: usize) {
-        let maybe_ids: Option<Vec<EntityId>> = world.run(|fish: View<IsFish>| {
+        let maybe_ids: Option<Vec<EntityId>> = world.run(|fish: View<FishIdentifier>| {
             let ids: Vec<EntityId> = (&fish).iter().with_id().map(|(id, _)| id).collect();
 
             if ids.is_empty() {

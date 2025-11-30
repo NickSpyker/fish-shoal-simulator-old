@@ -26,25 +26,27 @@ pub struct DeltaTime {
     delta: Duration,
 }
 
-impl Mul<f32> for DeltaTime {
-    type Output = f32;
-
-    fn mul(self, rhs: f32) -> Self::Output {
-        self.delta.as_secs_f32() * rhs
+impl DeltaTime {
+    pub fn calc(&mut self) {
+        let now = Instant::now();
+        self.delta = now - self.last_time;
+        self.last_time = now;
     }
 }
 
-impl DeltaTime {
-    pub fn new() -> Self {
+impl Default for DeltaTime {
+    fn default() -> Self {
         Self {
             last_time: Instant::now(),
             delta: Duration::default(),
         }
     }
+}
 
-    pub fn calc(&mut self) {
-        let now = Instant::now();
-        self.delta = now - self.last_time;
-        self.last_time = now;
+impl Mul<f32> for DeltaTime {
+    type Output = f32;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        self.delta.as_secs_f32() * rhs
     }
 }

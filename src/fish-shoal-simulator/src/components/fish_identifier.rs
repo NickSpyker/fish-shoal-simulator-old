@@ -17,4 +17,4 @@
 use shipyard::Component;
 
 #[derive(Component)]
-pub struct IsFish;
+pub struct FishIdentifier;

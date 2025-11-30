@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-use crate::{Area, Position};
+use crate::{Config, Position};
 use rayon::prelude::*;
 use shipyard::{IntoIter, UniqueView, ViewMut};
 
 pub struct OutOfBound;
 
 impl OutOfBound {
-    pub fn system(mut positions: ViewMut<Position>, area: UniqueView<Area>) {
-        let width: f32 = area.width;
-        let height: f32 = area.height;
+    pub fn system(mut positions: ViewMut<Position>, cfg: UniqueView<Config>) {
+        let width: f32 = cfg.width as f32;
+        let height: f32 = cfg.height as f32;
 
         (&mut positions).par_iter().for_each(|pos| {
             if pos.x <= 0.0 {

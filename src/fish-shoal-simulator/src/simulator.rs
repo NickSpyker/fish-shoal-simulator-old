@@ -15,89 +15,72 @@
  */
 
 use crate::{
-    Area, Config, DeltaTime, Error, Fish, Idle, Position, SimulatorOutput, Speed, SystemBundle,
-    Velocity,
+    Config, DeltaTime, Error, Fish, Position, SimulatorOutput, Speed, SystemBundle, Velocity,
 };
-use shipyard::{IntoIter, UniqueViewMut, View, World};
-use std::cmp::Ordering;
+use shipyard::{
+    error::{AddWorkload, RunWorkload},
+    {IntoIter, UniqueView, UniqueViewMut, View, World},
+};
+use std::{cmp::Ordering, mem};
 
-#[derive(Default)]
 pub struct FishShoalSimulator {
-    entities: World,
-    config: Config,
+    world: World,
 }
 
 impl FishShoalSimulator {
     pub fn new() -> Result<Self, Error> {
-        let mut world = World::new();
+        let mut world: World = World::default();
+        let cfg: Config = Config::default();
 
-        SystemBundle::build(&world).map_err(|err| Error::Create(err.to_string()))?;
+        world.add_unique(Config::default());
+        world.add_unique(DeltaTime::default());
 
-        let config = Config::default();
+        Fish::add(&mut world, cfg.entity_count, cfg.width, cfg.height);
+        SystemBundle::build(&world).map_err(|err: AddWorkload| Error::Create(err.to_string()))?;
 
-        world.add_unique(DeltaTime::new());
-        world.add_unique(Area::from_config(&config));
-        world.add_unique(Idle::default());
-
-        Fish::add(&mut world, config.nb_entities, config.width, config.height);
-
-        Ok(Self {
-            entities: world,
-            config,
-        })
-    }
-
-    pub fn setup(&mut self, config: Config) {
-        if self.config.width != config.width || self.config.height != config.height {
-            self.entities.run(|mut area: UniqueViewMut<Area>| {
-                area.width = config.width as f32;
-                area.height = config.height as f32;
-            });
-            self.config.width = config.width;
-            self.config.height = config.height;
-        }
-
-        match config.nb_entities.cmp(&self.config.nb_entities) {
-            Ordering::Greater => {
-                let to_add: usize = config.nb_entities - self.config.nb_entities;
-                Fish::add(
-                    &mut self.entities,
-                    to_add,
-                    self.config.width,
-                    self.config.height,
-                );
-                self.config.nb_entities = config.nb_entities;
-            }
-            Ordering::Less => {
-                let to_remove: usize = self.config.nb_entities - config.nb_entities;
-                Fish::remove(&mut self.entities, to_remove);
-                self.config.nb_entities = config.nb_entities;
-            }
-            _ => (),
-        }
-
-        self.entities
-            .run(|mut idle: UniqueViewMut<Idle>| idle.update(&config));
+        Ok(Self { world })
     }
 
     pub fn run<F>(&mut self, mut io: F) -> Result<(), Error>
     where
         F: FnMut(SimulatorOutput) -> Config + 'static,
     {
-        SystemBundle::run(&self.entities).map_err(|err| Error::Run(err.to_string()))?;
-        let mut config = Config::default();
-        self.entities.run(
+        SystemBundle::run(&self.world).map_err(|err: RunWorkload| Error::Run(err.to_string()))?;
+
+        let mut new_cfg: Config = Config::default();
+
+        self.world.run(
             |positions: View<Position>, velocities: View<Velocity>, speeds: View<Speed>| {
-                config = io(SimulatorOutput {
+                new_cfg = io(SimulatorOutput {
                     positions: positions.iter().map(|&position| position).collect(),
                     velocities: velocities.iter().map(|&position| position).collect(),
                     speeds: speeds.iter().map(|&position| position).collect(),
                 });
             },
         );
-        if config != self.config {
-            self.setup(config);
+
+        if self.world.run(|cfg: UniqueView<Config>| *cfg == new_cfg) {
+            self.update_config(new_cfg);
         }
+
         Ok(())
+    }
+
+    pub fn update_config(&mut self, new_cfg: Config) {
+        let old_cfg: Config = self
+            .world
+            .run(|mut cfg: UniqueViewMut<Config>| mem::replace(&mut *cfg, new_cfg));
+
+        match new_cfg.entity_count.cmp(&old_cfg.entity_count) {
+            Ordering::Greater => {
+                let to_add: usize = new_cfg.entity_count - old_cfg.entity_count;
+                Fish::add(&mut self.world, to_add, old_cfg.width, old_cfg.height);
+            }
+            Ordering::Less => {
+                let to_remove: usize = old_cfg.entity_count - new_cfg.entity_count;
+                Fish::remove(&mut self.world, to_remove);
+            }
+            _ => (),
+        }
     }
 }

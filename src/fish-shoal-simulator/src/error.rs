@@ -23,6 +23,7 @@ use std::{
 pub enum Error {
     Create(String),
     Run(String),
+    Config(String),
 }
 
 impl Display for Error {
@@ -33,6 +34,7 @@ impl Display for Error {
             match self {
                 Self::Create(err) => format!("create: {err}"),
                 Self::Run(err) => format!("run: {err}"),
+                Self::Config(err) => format!("config: {err}"),
             }
         )
     }

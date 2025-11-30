@@ -14,21 +14,8 @@
  * limitations under the License.
  */
 
-use crate::Config;
-use shipyard::Unique;
+mod config;
+mod delta_time;
 
-#[derive(Unique, Debug, Copy, Clone, PartialOrd, PartialEq)]
-pub struct Area {
-    pub width: f32,
-    pub height: f32,
-}
-
-impl Area {
-    pub fn new(width: f32, height: f32) -> Self {
-        Self { width, height }
-    }
-
-    pub fn from_config(config: &Config) -> Self {
-        Self::new(config.width as f32, config.height as f32)
-    }
-}
+pub use config::Config;
+pub use delta_time::DeltaTime;

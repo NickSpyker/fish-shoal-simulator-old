@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{Idle, Speed, Stress, TargetSpeed, TargetVelocity, Velocity};
+use crate::{Config, Speed, Stress, TargetSpeed, TargetVelocity, Velocity};
 use rand::{rngs::ThreadRng, Rng};
 use rayon::prelude::*;
 use shipyard::{IntoIter, UniqueView, ViewMut};
@@ -26,28 +26,28 @@ impl RandomBehavior {
         mut target_velocities: ViewMut<TargetVelocity>,
         mut target_speeds: ViewMut<TargetSpeed>,
         mut stress: ViewMut<Stress>,
-        idle: UniqueView<Idle>,
+        config: UniqueView<Config>,
     ) {
         (&mut target_velocities, &mut target_speeds, &mut stress)
             .par_iter()
             .for_each(|(target_vel, target_speed, stress)| {
                 let mut rng: ThreadRng = rand::rng();
 
-                if rng.random_bool(idle.chance_to_change_direction) {
+                if rng.random_bool(config.direction_change_prob) {
                     let random_direction = Velocity::new();
                     target_vel
                         .0
                         .lerp(&random_direction, rng.random_range(0.0..1.0));
                 }
 
-                if rng.random_bool(idle.chance_to_change_speed) {
+                if rng.random_bool(config.speed_change_prob) {
                     let random_speed = Speed::new_random(10.0, 100.0);
                     target_speed
                         .0
                         .lerp(&random_speed, rng.random_range(0.0..1.0));
                 }
 
-                if rng.random_bool(idle.chance_to_change_stress) {
+                if rng.random_bool(config.stress_change_prob) {
                     let random_stress = Stress::new_random();
                     stress.lerp(&random_stress, rng.random_range(0.0..1.0));
                 }
