@@ -30,6 +30,17 @@ impl SideBar {
                 ui.heading("Configuration");
 
                 ui.separator();
+                ui.heading(RichText::new("Simulation").size(14.0));
+                ui.horizontal(|ui| {
+                    if ui.selectable_label(!app.config.paused, "Run").clicked() {
+                        app.config.paused = false;
+                    }
+                    if ui.selectable_label(app.config.paused, "Pause").clicked() {
+                        app.config.paused = true;
+                    }
+                });
+
+                ui.separator();
                 ui.heading(RichText::new("Entities").size(14.0));
                 ui.add(Slider::new(&mut app.config.entity_count, 0..=10_000).text("Count"));
 

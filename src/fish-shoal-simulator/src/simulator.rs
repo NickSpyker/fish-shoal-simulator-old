@@ -15,12 +15,12 @@
  */
 
 use crate::{
-    Config, DeltaTime, Error, Position, SimulatorOutput, Speed, Velocity, entities::Fish,
-    systems::*,
+    entities::Fish, systems::*, Config, DeltaTime, Error, Position, SimulatorOutput, Speed,
+    Velocity,
 };
 use shipyard::{
-    Workload,
     error::{AddWorkload, RunWorkload},
+    Workload,
     {IntoIter, UniqueView, UniqueViewMut, View, World},
 };
 use std::{cmp::Ordering, mem};
@@ -28,6 +28,7 @@ use std::{cmp::Ordering, mem};
 #[derive(Debug)]
 pub struct FishShoalSimulator {
     world: World,
+    paused: bool,
 }
 
 impl FishShoalSimulator {
@@ -50,16 +51,21 @@ impl FishShoalSimulator {
             .add_to_world(&world)
             .map_err(|err: AddWorkload| Error::Create(err.to_string()))?;
 
-        Ok(Self { world })
+        Ok(Self {
+            world,
+            paused: false,
+        })
     }
 
     pub fn run<F>(&mut self, mut io: F) -> Result<(), Error>
     where
         F: FnMut(SimulatorOutput) -> Config + 'static,
     {
-        self.world
-            .run_workload("sim")
-            .map_err(|err: RunWorkload| Error::Run(err.to_string()))?;
+        if !self.paused {
+            self.world
+                .run_workload("sim")
+                .map_err(|err: RunWorkload| Error::Run(err.to_string()))?;
+        }
 
         let mut new_cfg: Config = Config::default();
 
@@ -79,6 +85,8 @@ impl FishShoalSimulator {
         if self.world.run(|cfg: UniqueView<Config>| *cfg != new_cfg) {
             self.update_config(new_cfg);
         }
+
+        self.paused = new_cfg.paused;
 
         Ok(())
     }
