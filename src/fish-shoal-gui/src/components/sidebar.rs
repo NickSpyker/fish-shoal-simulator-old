@@ -42,7 +42,7 @@ impl UiComponent for SideBar {
                 ui.separator();
 
                 let mut nb_entities = app.config.nb_entities as u32;
-                ui.add(Slider::new(&mut nb_entities, 0..=250_000).text("Entities"));
+                ui.add(Slider::new(&mut nb_entities, 0..=100_000).text("Entities"));
                 app.config.nb_entities = nb_entities as usize;
             });
     }
