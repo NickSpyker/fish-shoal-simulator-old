@@ -43,13 +43,13 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            asset_name: fish-shoal-simulator-linux-amd64
+            asset_name: fish-shoal-simulator-linux
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            asset_name: fish-shoal-simulator-windows-amd64.exe
+            asset_name: fish-shoal-simulator-windows.exe
           - os: macos-latest
             target: aarch64-apple-darwin
-            asset_name: fish-shoal-simulator-macos-arm64
+            asset_name: fish-shoal-simulator-macos
 
     steps:
       - uses: actions/checkout@v4
@@ -88,7 +88,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ env.PROJECT_VERSION }}
-          name: Release v${{ env.PROJECT_VERSION }}
+          name: v${{ env.PROJECT_VERSION }}
           files: ${{ matrix.asset_name }}
           make_latest: true
         env:
