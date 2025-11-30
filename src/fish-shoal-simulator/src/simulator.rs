@@ -73,7 +73,7 @@ impl FishShoalSimulator {
             },
         );
 
-        if self.world.run(|cfg: UniqueView<Config>| *cfg == new_cfg) {
+        if self.world.run(|cfg: UniqueView<Config>| *cfg != new_cfg) {
             self.update_config(new_cfg);
         }
 
