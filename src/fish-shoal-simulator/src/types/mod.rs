@@ -16,8 +16,10 @@
 
 mod angle;
 mod radius;
+mod scalar;
 mod vec2;
 
 pub use angle::Angle;
 pub use radius::Radius;
+pub use scalar::Scalar;
 pub use vec2::Vec2;

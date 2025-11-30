@@ -50,3 +50,11 @@ impl Mul<f32> for DeltaTime {
         self.delta.as_secs_f32() * rhs
     }
 }
+
+impl Mul<DeltaTime> for f32 {
+    type Output = f32;
+
+    fn mul(self, rhs: DeltaTime) -> Self::Output {
+        self * rhs.delta.as_secs_f32()
+    }
+}

@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-use crate::components::Simulation;
-use crate::{error::EFrameError, Error, SideBar, UiComponent};
+use crate::{Error, SideBar, Simulation};
 use eframe::{
     egui::{Context, Vec2, ViewportBuilder}, App, Frame,
-    NativeOptions
-    ,
+    NativeOptions,
 };
 use fish_shoal_simulator::{Config, SimulatorOutput};
 use std::sync::mpsc::{Receiver, Sender};
@@ -28,7 +26,7 @@ pub struct FishShoalGui {
     pub data_receiver: Receiver<SimulatorOutput>,
     pub config_sender: Sender<Config>,
     pub config: Config,
-    pub available_area: Vec2,
+    pub screen: Vec2,
     initialized: bool,
 }
 
@@ -38,7 +36,7 @@ impl FishShoalGui {
             data_receiver,
             config_sender,
             config: Config::default(),
-            available_area: Vec2::default(),
+            screen: Vec2::default(),
             initialized: false,
         }
     }
@@ -49,14 +47,13 @@ impl FishShoalGui {
             NativeOptions {
                 viewport: ViewportBuilder::default()
                     .with_min_inner_size([384.0, 216.0])
-                    //.with_inner_size([1024.0, 576.0])
                     .with_maximized(true),
                 centered: true,
                 ..Default::default()
             },
             Box::new(|_| Ok(Box::new(self))),
         )
-        .map_err(|err| Error::EFrame(EFrameError(err.to_string())))
+        .map_err(|err| Error::EFrame(err.to_string()))
     }
 }
 
@@ -70,8 +67,8 @@ impl App for FishShoalGui {
         Simulation::render(self, ctx, frame);
 
         if !self.initialized {
-            self.config.width = self.available_area.x as usize;
-            self.config.height = self.available_area.y as usize;
+            self.config.width = self.screen.x as usize;
+            self.config.height = self.screen.y as usize;
             self.initialized = true;
         }
 

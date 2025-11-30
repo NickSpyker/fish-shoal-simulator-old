@@ -14,53 +14,8 @@
  * limitations under the License.
  */
 
-use rand::{rngs::ThreadRng, Rng};
+use crate::Scalar;
 use shipyard::Component;
-use std::ops::{Add, Mul, Sub};
 
-#[derive(Component, Debug, Default, Copy, Clone, PartialOrd, PartialEq)]
-pub struct Speed(pub f32);
-
-impl Add<Speed> for Speed {
-    type Output = Self;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        Self(self.0 + rhs.0)
-    }
-}
-
-impl Sub<Speed> for Speed {
-    type Output = Self;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        Self(self.0 - rhs.0)
-    }
-}
-
-impl Mul<f32> for Speed {
-    type Output = Self;
-
-    fn mul(self, rhs: f32) -> Self::Output {
-        Self(self.0 * rhs)
-    }
-}
-
-impl Speed {
-    pub fn new_zero() -> Self {
-        Self(0.0)
-    }
-
-    pub fn new_random(low: f32, high: f32) -> Self {
-        let mut rng: ThreadRng = rand::rng();
-
-        let speed: f32 = rng.random_range(low..=high);
-
-        Self(speed)
-    }
-
-    pub fn lerp(&mut self, to: &Self, factor: f32) -> Self {
-        let new_speed: Self = *self + (*to - *self) * factor;
-        *self = new_speed;
-        self.clone()
-    }
-}
+#[derive(Component, Debug)]
+pub struct Speed(pub Scalar);

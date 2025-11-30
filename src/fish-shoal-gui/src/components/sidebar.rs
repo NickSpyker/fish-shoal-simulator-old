@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{FishShoalGui, UiComponent};
+use crate::FishShoalGui;
 use eframe::{
     egui::{Context, RichText, SidePanel, Slider},
     Frame,
@@ -22,58 +22,49 @@ use eframe::{
 
 pub struct SideBar;
 
-impl UiComponent for SideBar {
-    fn render(app: &mut FishShoalGui, ctx: &Context, _frame: &mut Frame) {
+impl SideBar {
+    pub(crate) fn render(app: &mut FishShoalGui, ctx: &Context, _frame: &mut Frame) {
         SidePanel::left("sidebar")
-            .default_width(200.0)
+            .default_width(250.0)
             .show(ctx, |ui| {
                 ui.heading("Configuration");
 
                 ui.separator();
-
-                let mut nb_entities = app.config.entity_count as u32;
-                ui.add(Slider::new(&mut nb_entities, 0..=10_000).text("Entities"));
-                app.config.entity_count = nb_entities as usize;
+                ui.heading(RichText::new("Entities").size(14.0));
+                ui.add(Slider::new(&mut app.config.entity_count, 0..=10_000).text("Count"));
 
                 ui.separator();
-
-                let mut width = app.config.width as u32;
-                let max_width = app.available_area.x as u32;
-                ui.add(Slider::new(&mut width, 100..=max_width).text("Width"));
-                app.config.width = width as usize;
-
-                let mut height = app.config.height as u32;
-                let max_height = app.available_area.y as u32;
-                ui.add(Slider::new(&mut height, 100..=max_height).text("Height"));
-                app.config.height = height as usize;
-
-                ui.separator();
-
-                ui.heading(RichText::new("Idle behavior change probability").size(14.0));
-
-                let mut change_dir_proba = app.config.direction_change_prob * 100.0;
+                ui.heading(RichText::new("Area").size(14.0));
                 ui.add(
-                    Slider::new(&mut change_dir_proba, 0.0..=100.0)
+                    Slider::new(&mut app.config.width, 100..=app.screen.x as usize).text("Width"),
+                );
+                ui.add(
+                    Slider::new(&mut app.config.height, 100..=app.screen.y as usize).text("Height"),
+                );
+
+                ui.separator();
+                ui.heading(RichText::new("Idle behavior change probability").size(14.0));
+                let mut dir_change_prob: f64 = app.config.direction_change_prob * 100.0;
+                let mut speed_change_prob: f64 = app.config.speed_change_prob * 100.0;
+                let mut stress_change_proba: f64 = app.config.stress_change_prob * 100.0;
+                ui.add(
+                    Slider::new(&mut dir_change_prob, 0.0..=100.0)
                         .suffix(" %")
                         .text("Direction"),
                 );
-                app.config.direction_change_prob = change_dir_proba / 100.0;
-
-                let mut change_speed_proba = app.config.speed_change_prob * 100.0;
                 ui.add(
-                    Slider::new(&mut change_speed_proba, 0.0..=100.0)
+                    Slider::new(&mut speed_change_prob, 0.0..=100.0)
                         .suffix(" %")
                         .text("Speed"),
                 );
-                app.config.speed_change_prob = change_speed_proba / 100.0;
-
-                let mut change_stress_proba = app.config.stress_change_prob * 100.0;
                 ui.add(
-                    Slider::new(&mut change_stress_proba, 0.0..=100.0)
+                    Slider::new(&mut stress_change_proba, 0.0..=100.0)
                         .suffix(" %")
                         .text("Stress"),
                 );
-                app.config.stress_change_prob = change_stress_proba / 100.0;
+                app.config.direction_change_prob = dir_change_prob / 100.0;
+                app.config.speed_change_prob = speed_change_prob / 100.0;
+                app.config.stress_change_prob = stress_change_proba / 100.0;
             });
     }
 }

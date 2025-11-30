@@ -15,12 +15,12 @@
  */
 
 use crate::{
-    entities::Fish, systems::*, Config, DeltaTime, Error, Position, SimulatorOutput, Speed,
-    Velocity,
+    Config, DeltaTime, Error, Position, SimulatorOutput, Speed, Velocity, entities::Fish,
+    systems::*,
 };
 use shipyard::{
-    error::{AddWorkload, RunWorkload},
     Workload,
+    error::{AddWorkload, RunWorkload},
     {IntoIter, UniqueView, UniqueViewMut, View, World},
 };
 use std::{cmp::Ordering, mem};
@@ -66,9 +66,12 @@ impl FishShoalSimulator {
         self.world.run(
             |positions: View<Position>, velocities: View<Velocity>, speeds: View<Speed>| {
                 new_cfg = io(SimulatorOutput {
-                    positions: positions.iter().map(|position| position.0).collect(),
-                    velocities: velocities.iter().map(|velocity| velocity.0).collect(),
-                    speeds: speeds.iter().map(|&speed| speed.0).collect(),
+                    positions: positions.iter().map(|position| position.0.into()).collect(),
+                    velocities: velocities
+                        .iter()
+                        .map(|velocity| velocity.0.into())
+                        .collect(),
+                    speeds: speeds.iter().map(|speed| speed.0.value).collect(),
                 });
             },
         );

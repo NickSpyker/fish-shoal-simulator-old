@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-use crate::components::Entities;
-use crate::{FishShoalGui, UiComponent};
+use crate::{Entities, FishShoalGui};
 use eframe::{
-    egui::{CentralPanel, Context},
+    egui::{CentralPanel, Context, Painter},
     emath::{Pos2, Rect, Vec2},
     epaint::{Color32, Stroke, StrokeKind},
     Frame,
@@ -25,21 +24,21 @@ use eframe::{
 
 pub struct Simulation;
 
-impl UiComponent for Simulation {
-    fn render(app: &mut FishShoalGui, ctx: &Context, _frame: &mut Frame) {
+impl Simulation {
+    pub(crate) fn render(app: &mut FishShoalGui, ctx: &Context, _frame: &mut Frame) {
         CentralPanel::default().show(ctx, |ui| {
-            let rect = ui.max_rect();
-            app.available_area = rect.size();
+            let rect: Rect = ui.max_rect();
+            app.screen = rect.size();
 
-            let painter = ui.painter_at(rect);
-
-            let margin_hor: f32 = (app.available_area.x - app.config.width as f32) / 2.0;
-            let margin_ver: f32 = (app.available_area.y - app.config.height as f32) / 2.0;
-            let top_left = Pos2::new(rect.min.x + margin_hor, rect.min.y + margin_ver);
-            let config_rect = Rect::from_min_size(
+            let margin_hor: f32 = (app.screen.x - app.config.width as f32) / 2.0;
+            let margin_ver: f32 = (app.screen.y - app.config.height as f32) / 2.0;
+            let top_left: Pos2 = Pos2::new(rect.min.x + margin_hor, rect.min.y + margin_ver);
+            let config_rect: Rect = Rect::from_min_size(
                 top_left,
                 Vec2::new(app.config.width as f32, app.config.height as f32),
             );
+
+            let painter: Painter = ui.painter_at(rect);
 
             painter.rect_stroke(
                 config_rect,

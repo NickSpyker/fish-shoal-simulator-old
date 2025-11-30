@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-use crate::Vec2;
-
 #[derive(Debug, Default)]
 pub struct SimulatorOutput {
-    pub positions: Vec<Vec2>,
-    pub velocities: Vec<Vec2>,
+    pub positions: Vec<[f32; 2]>,
+    pub velocities: Vec<[f32; 2]>,
     pub speeds: Vec<f32>,
 }

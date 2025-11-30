@@ -21,7 +21,7 @@ use std::{
 
 #[derive(Debug)]
 pub enum Error {
-    EFrame(EFrameError),
+    EFrame(String),
 }
 
 impl Display for Error {
@@ -36,21 +36,4 @@ impl Display for Error {
     }
 }
 
-impl error::Error for Error {
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        match self {
-            Self::EFrame(source) => Some(source),
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct EFrameError(pub String);
-
-impl Display for EFrameError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
-
-impl error::Error for EFrameError {}
+impl error::Error for Error {}

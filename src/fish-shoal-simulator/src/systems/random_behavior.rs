@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-use crate::{Config, Speed, Stress, TargetSpeed, TargetVelocity, Vec2};
-use rand::{Rng, rngs::ThreadRng};
+use crate::{Config, Scalar, Stress, TargetSpeed, TargetVelocity, Vec2};
+use rand::{rngs::ThreadRng, Rng};
 use rayon::prelude::*;
 use shipyard::{IntoIter, UniqueView, ViewMut};
 
@@ -36,21 +36,21 @@ impl RandomBehavior {
 
                 if rng.random_bool(cfg.direction_change_prob) {
                     let random_direction = Vec2::random_dir(&mut rng);
-                    target_vel
+                    target_vel.0 = target_vel
                         .0
                         .lerp(random_direction, rng.random_range(0.0..1.0));
                 }
 
                 if rng.random_bool(cfg.speed_change_prob) {
-                    let random_speed = Speed::new_random(10.0, 100.0);
-                    target_speed
+                    let random_speed = Scalar::new_random(&mut rng, 10.0..100.0);
+                    target_speed.0 = target_speed
                         .0
-                        .lerp(&random_speed, rng.random_range(0.0..1.0));
+                        .lerp(random_speed, rng.random_range(0.0..1.0));
                 }
 
                 if rng.random_bool(cfg.stress_change_prob) {
-                    let random_stress = Stress::new_random();
-                    stress.lerp(&random_stress, rng.random_range(0.0..1.0));
+                    let random_stress = Scalar::new_random(&mut rng, 0.1..0.5);
+                    stress.0 = stress.0.lerp(random_stress, rng.random_range(0.0..1.0));
                 }
             })
     }

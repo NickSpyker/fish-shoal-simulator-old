@@ -22,46 +22,37 @@ use std::{
     thread::{self, JoinHandle},
 };
 
-pub struct FishShoalApp {
-    sim_config_sender: Sender<Config>,
-    sim_config_receiver: Receiver<Config>,
-    sim_data_sender: Sender<SimulatorOutput>,
-    sim_data_receiver: Receiver<SimulatorOutput>,
-}
+pub struct FishShoalApp;
 
 impl FishShoalApp {
-    pub fn new() -> Self {
-        let (sim_config_sender, sim_config_receiver) = mpsc::channel();
-        let (sim_data_sender, sim_data_receiver) = mpsc::channel();
-        Self {
-            sim_config_sender,
-            sim_config_receiver,
-            sim_data_sender,
-            sim_data_receiver,
-        }
-    }
+    pub fn run() -> Result<(), Error> {
+        let mut sim: FishShoalSimulator = FishShoalSimulator::new().map_err(Error::Simulator)?;
 
-    pub fn run(self) -> Result<(), Error> {
-        let mut sim = FishShoalSimulator::new().map_err(Error::Simulator)?;
-        let gui = FishShoalGui::new(self.sim_data_receiver, self.sim_config_sender);
+        let (cfg_sender, cfg_receiver): (Sender<Config>, Receiver<Config>) =
+            mpsc::channel::<Config>();
+
+        let (data_sender, data_receiver): (Sender<SimulatorOutput>, Receiver<SimulatorOutput>) =
+            mpsc::channel::<SimulatorOutput>();
+
+        let gui: FishShoalGui = FishShoalGui::new(data_receiver, cfg_sender);
 
         let sim_thread: JoinHandle<Result<(), Error>> = thread::spawn(move || {
-            let data_sender = self.sim_data_sender;
-            let config_receiver = self.sim_config_receiver;
-
             loop {
-                let config: Config = match config_receiver.recv() {
+                let cfg: Config = match cfg_receiver.recv() {
                     Ok(cfg) => cfg,
                     Err(_) => break,
                 };
 
-                let data_sender = data_sender.clone();
+                let data_sender: Sender<SimulatorOutput> = data_sender.clone();
 
                 sim.run(move |output: SimulatorOutput| {
-                    data_sender
-                        .send(output)
-                        .expect("Fish Shoal App crash caused by simulator data sender");
-                    config
+                    if data_sender.send(output).is_err() {
+                        return Config {
+                            running: false,
+                            ..Default::default()
+                        };
+                    }
+                    cfg
                 })
                 .map_err(Error::Simulator)?;
             }

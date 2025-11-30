@@ -18,6 +18,7 @@ use crate::Utils;
 use eframe::{
     egui::{Painter, Shape, Stroke},
     emath::{Pos2, Vec2},
+    epaint::Color32,
 };
 use fish_shoal_simulator::SimulatorOutput;
 
@@ -25,36 +26,34 @@ pub struct Entities;
 
 impl Entities {
     pub fn render_all(painter: Painter, data: SimulatorOutput, origin: Pos2) {
-        let count: usize = data.positions.len();
-
-        for i in 0..count {
+        for i in 0..data.positions.len() {
             Self::render_entity(i, &painter, &data, origin);
         }
     }
 
     fn render_entity(idx: usize, painter: &Painter, data: &SimulatorOutput, origin: Pos2) {
-        let position = data.positions[idx];
-        let velocity = data.velocities[idx];
-        let speed = data.speeds[idx];
+        let position: [f32; 2] = data.positions[idx];
+        let velocity: [f32; 2] = data.velocities[idx];
+        let speed: f32 = data.speeds[idx];
 
-        let screen_pos = origin + Vec2::new(position.x, position.y);
-        let color = Utils::speed_to_color(speed);
+        let screen_pos: Pos2 = origin + Vec2::new(position[0], position[1]);
+        let color: Color32 = Utils::speed_to_color(speed);
 
         if speed > 0.1 {
-            let vel_vec = Vec2::new(velocity.x, velocity.y);
+            let vel_vec: Vec2 = Vec2::new(velocity[0], velocity[1]);
 
-            let direction = vel_vec.normalized();
+            let direction: Vec2 = vel_vec.normalized();
 
-            let size = 6.0;
-            let width = 3.0;
+            let size: f32 = 6.0;
+            let width: f32 = 3.0;
 
-            let nose = screen_pos + direction * size;
+            let nose: Pos2 = screen_pos + direction * size;
 
-            let right = Vec2::new(direction.y, -direction.x) * width;
-            let tail_base = screen_pos - direction * (size * 0.5);
+            let right: Vec2 = Vec2::new(direction.y, -direction.x) * width;
+            let tail_base: Pos2 = screen_pos - direction * (size * 0.5);
 
-            let corner_left = tail_base - right;
-            let corner_right = tail_base + right;
+            let corner_left: Pos2 = tail_base - right;
+            let corner_right: Pos2 = tail_base + right;
 
             painter.add(Shape::convex_polygon(
                 vec![nose, corner_right, corner_left],

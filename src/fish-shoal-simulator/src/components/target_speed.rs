@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-use crate::Speed;
+use crate::Scalar;
 use shipyard::Component;
 
-#[derive(Component, Debug, Default, Copy, Clone, PartialOrd, PartialEq)]
-pub struct TargetSpeed(pub Speed);
-
-impl TargetSpeed {
-    pub fn new_random(low: f32, high: f32) -> Self {
-        Self(Speed::new_random(low, high))
-    }
-}
+#[derive(Component, Debug)]
+pub struct TargetSpeed(pub Scalar);

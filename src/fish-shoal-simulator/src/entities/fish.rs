@@ -15,7 +15,8 @@
  */
 
 use crate::{
-    Config, FishIdentifier, Position, Speed, Stress, TargetSpeed, TargetVelocity, Vec2, Velocity,
+    Config, FishIdentifier, Position, Scalar, Speed, Stress, TargetSpeed, TargetVelocity, Vec2,
+    Velocity,
 };
 use rand::{rngs::ThreadRng, seq::SliceRandom};
 use shipyard::{EntityId, IntoIter, View, World};
@@ -37,9 +38,9 @@ impl Fish {
                 )),
                 Velocity(Vec2::random_dir(&mut rng)),
                 TargetVelocity(Vec2::random_dir(&mut rng)),
-                Speed::new_zero(),
-                TargetSpeed::new_random(10.0, 100.0),
-                Stress::default(),
+                Speed(Scalar::ZERO),
+                TargetSpeed(Scalar::new_random(&mut rng, 10.0..100.0)),
+                Stress(Scalar::new(0.1)),
             ));
         }
     }

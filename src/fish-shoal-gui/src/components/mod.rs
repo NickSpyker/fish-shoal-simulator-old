@@ -21,10 +21,3 @@ mod simulation;
 pub use entities::Entities;
 pub use sidebar::SideBar;
 pub use simulation::Simulation;
-
-use crate::FishShoalGui;
-use eframe::{egui::Context, Frame};
-
-pub trait UiComponent {
-    fn render(app: &mut FishShoalGui, ctx: &Context, frame: &mut Frame);
-}

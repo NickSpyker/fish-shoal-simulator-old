@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 use crate::{DeltaTime, Position, Speed, Velocity};
 use rayon::prelude::*;
 use shipyard::{IntoIter, UniqueView, View, ViewMut};
@@ -33,8 +32,8 @@ impl Motion {
         (&mut positions, &velocities, &speeds)
             .par_iter()
             .for_each(|(pos, vel, speed)| {
-                pos.0.x += dt * (*speed * vel.0.x).0;
-                pos.0.y += dt * (*speed * vel.0.y).0;
+                pos.0.x += vel.0.x * speed.0.value * dt;
+                pos.0.y += vel.0.y * speed.0.value * dt;
             })
     }
 }
