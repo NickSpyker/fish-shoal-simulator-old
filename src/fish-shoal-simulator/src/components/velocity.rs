@@ -16,6 +16,7 @@
 
 use rand::{rngs::ThreadRng, Rng};
 use shipyard::Component;
+use std::ops::{Add, Mul, Sub};
 
 #[derive(Component, Debug, Default, Copy, Clone, PartialOrd, PartialEq)]
 pub struct Velocity {
@@ -23,35 +24,63 @@ pub struct Velocity {
     pub dy: f32,
 }
 
+impl Add<Velocity> for Velocity {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            dx: self.dx + rhs.dx,
+            dy: self.dy + rhs.dy,
+        }
+    }
+}
+
+impl Sub<Velocity> for Velocity {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self {
+            dx: self.dx - rhs.dx,
+            dy: self.dy - rhs.dy,
+        }
+    }
+}
+
+impl Mul<f32> for Velocity {
+    type Output = Self;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        Self {
+            dx: self.dx * rhs,
+            dy: self.dy * rhs,
+        }
+    }
+}
+
 impl Velocity {
-    pub fn new(dx: f32, dy: f32) -> Self {
-        Self { dx, dy }
-    }
-
-    pub fn new_zero() -> Self {
-        Self::new(0.0, 0.0)
-    }
-
-    pub fn new_random() -> Self {
+    pub fn new() -> Self {
         let mut rng: ThreadRng = rand::rng();
 
         let dx: f32 = rng.random_range(-1.0..=1.0);
         let dy: f32 = rng.random_range(-1.0..=1.0);
 
-        Self::new(dx, dy).normalized()
+        Self { dx, dy }.normalize()
     }
 
-    pub fn normalize(&mut self) {
+    pub fn normalize(&mut self) -> Self {
         let len: f32 = self.dx.hypot(self.dy);
+
         if len > 0.0 {
             self.dx /= len;
             self.dy /= len;
         }
+
+        self.clone()
     }
 
-    pub fn normalized(&self) -> Self {
-        let mut vec: Self = self.clone();
-        vec.normalize();
-        vec
+    pub fn lerp(&mut self, to: &Self, factor: f32) -> Self {
+        let new_vec: Self = *self + (*to - *self) * factor;
+        *self = new_vec;
+        self.normalize()
     }
 }

@@ -14,22 +14,7 @@
  * limitations under the License.
  */
 
-mod area;
-mod delta_time;
-mod is_fish;
-mod position;
-mod speed;
-mod stress;
-mod target_speed;
-mod target_velocity;
-mod velocity;
+use shipyard::Component;
 
-pub use area::Area;
-pub use delta_time::DeltaTime;
-pub use is_fish::IsFish;
-pub use position::Position;
-pub use speed::Speed;
-pub use stress::Stress;
-pub use target_speed::TargetSpeed;
-pub use target_velocity::TargetVelocity;
-pub use velocity::Velocity;
+#[derive(Component)]
+pub struct IsFish;

@@ -32,8 +32,8 @@ impl Motion {
         (&mut positions, &velocities, &speeds)
             .par_iter()
             .for_each(|(pos, vel, speed)| {
-                pos.x += dt * (speed * vel.dx);
-                pos.y += dt * (speed * vel.dy);
+                pos.x += dt * (*speed * vel.dx).0;
+                pos.y += dt * (*speed * vel.dy).0;
             })
     }
 }

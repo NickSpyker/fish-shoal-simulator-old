@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{Position, Speed, Velocity};
+use crate::{IsFish, Position, Speed, Stress, TargetSpeed, TargetVelocity, Velocity};
 use rand::{rngs::ThreadRng, seq::SliceRandom};
 use shipyard::{EntityId, IntoIter, View, World};
 
@@ -24,37 +24,34 @@ impl Fish {
     pub fn add(world: &mut World, amount: usize, area_width: usize, area_height: usize) {
         for _ in 0..amount {
             world.add_entity((
+                IsFish,
                 Position::new_random(0.0, area_width as f32, 0.0, area_height as f32),
-                Velocity::new_random(),
-                Speed::new_random(10.0, 100.0),
+                Velocity::new(),
+                TargetVelocity::new(),
+                Speed::new_zero(),
+                TargetSpeed::new_random(10.0, 100.0),
+                Stress::default(),
             ));
         }
     }
 
     pub fn remove(world: &mut World, amount: usize) {
-        let maybe_ids: Option<Vec<EntityId>> = world.run(
-            |positions: View<Position>, velocities: View<Velocity>, speeds: View<Speed>| {
-                let ids: Vec<EntityId> = (&positions, &velocities, &speeds)
-                    .iter()
-                    .with_id()
-                    .map(|(id, _)| id)
-                    .collect();
+        let maybe_ids: Option<Vec<EntityId>> = world.run(|fish: View<IsFish>| {
+            let ids: Vec<EntityId> = (&fish).iter().with_id().map(|(id, _)| id).collect();
 
-                if ids.is_empty() {
-                    return None;
-                }
+            if ids.is_empty() {
+                return None;
+            }
 
-                let mut rng: ThreadRng = rand::rng();
-                let count: usize = amount.min(ids.len());
+            let mut rng: ThreadRng = rand::rng();
+            let count: usize = amount.min(ids.len());
 
-                let mut indices: Vec<usize> = (0..ids.len()).collect();
-                indices.shuffle(&mut rng);
-                let chosen: Vec<EntityId> =
-                    indices.into_iter().take(count).map(|i| ids[i]).collect();
+            let mut indices: Vec<usize> = (0..ids.len()).collect();
+            indices.shuffle(&mut rng);
+            let chosen: Vec<EntityId> = indices.into_iter().take(count).map(|i| ids[i]).collect();
 
-                Some(chosen)
-            },
-        );
+            Some(chosen)
+        });
 
         if let Some(ids) = maybe_ids {
             for id in ids {

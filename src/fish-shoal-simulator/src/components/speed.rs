@@ -16,26 +16,38 @@
 
 use rand::{rngs::ThreadRng, Rng};
 use shipyard::Component;
-use std::ops::Mul;
+use std::ops::{Add, Mul, Sub};
 
 #[derive(Component, Debug, Default, Copy, Clone, PartialOrd, PartialEq)]
 pub struct Speed(pub f32);
 
-impl Mul<f32> for &Speed {
-    type Output = f32;
+impl Add<Speed> for Speed {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self(self.0 + rhs.0)
+    }
+}
+
+impl Sub<Speed> for Speed {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self(self.0 - rhs.0)
+    }
+}
+
+impl Mul<f32> for Speed {
+    type Output = Self;
 
     fn mul(self, rhs: f32) -> Self::Output {
-        self.0 * rhs
+        Self(self.0 * rhs)
     }
 }
 
 impl Speed {
-    pub fn new(speed: f32) -> Self {
-        Self(speed)
-    }
-
     pub fn new_zero() -> Self {
-        Self::new(0.0)
+        Self(0.0)
     }
 
     pub fn new_random(low: f32, high: f32) -> Self {
@@ -43,6 +55,12 @@ impl Speed {
 
         let speed: f32 = rng.random_range(low..=high);
 
-        Self::new(speed)
+        Self(speed)
+    }
+
+    pub fn lerp(&mut self, to: &Self, factor: f32) -> Self {
+        let new_speed: Self = *self + (*to - *self) * factor;
+        *self = new_speed;
+        self.clone()
     }
 }
