@@ -14,8 +14,18 @@
  * limitations under the License.
  */
 
-use crate::Vec2;
-use shipyard::Component;
+use crate::{Config, Position, Speed, Velocity};
+use shipyard::{UniqueView, View, ViewMut};
 
-#[derive(Component, Debug, Copy, Clone)]
-pub struct Velocity(pub Vec2);
+#[derive(Debug)]
+pub struct Swarming;
+
+impl Swarming {
+    pub fn system(
+        positions: View<Position>,
+        mut velocities: ViewMut<Velocity>,
+        mut speeds: ViewMut<Speed>,
+        cfg: UniqueView<Config>,
+    ) {
+    }
+}

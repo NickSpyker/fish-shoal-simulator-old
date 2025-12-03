@@ -15,7 +15,7 @@
  */
 
 use crate::{
-    entities::Fish, systems::*, Config, DeltaTime, Error, Position, SimulatorOutput, Speed,
+    entities::Fish, systems::*, Chunks, Config, DeltaTime, Error, Position, SimulatorOutput, Speed,
     Velocity,
 };
 use shipyard::{
@@ -38,16 +38,19 @@ impl FishShoalSimulator {
 
         world.add_unique(Config::default());
         world.add_unique(DeltaTime::default());
+        world.add_unique(Chunks::new(cfg.attraction_radius));
 
         Fish::add(&mut world, cfg.entity_count, cfg);
 
         Workload::new("sim")
             .with_system(CalculateDeltaTime::system)
+            .with_system(LoadChunks::system)
             .with_barrier()
             .with_system(Motion::system)
             .with_system(OutOfBound::system)
             .with_system(LerpToTarget::system)
             .with_system(RandomBehavior::system)
+            .with_system(Swarming::system)
             .add_to_world(&world)
             .map_err(|err: AddWorkload| Error::Create(err.to_string()))?;
 

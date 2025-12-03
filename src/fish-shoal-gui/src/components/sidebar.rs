@@ -76,6 +76,14 @@ impl SideBar {
                 app.config.direction_change_prob = dir_change_prob / 100.0;
                 app.config.speed_change_prob = speed_change_prob / 100.0;
                 app.config.stress_change_prob = stress_change_proba / 100.0;
+
+                ui.separator();
+                ui.heading(RichText::new("Shoal behavior radius").size(14.0));
+                ui.add(
+                    Slider::new(&mut app.config.attraction_radius, 0.0..=50.0).text("Attraction"),
+                );
+                ui.add(Slider::new(&mut app.config.alignment_radius, 0.0..=50.0).text("Alignment"));
+                ui.add(Slider::new(&mut app.config.avoidance_radius, 0.0..=50.0).text("Avoidance"));
             });
     }
 }

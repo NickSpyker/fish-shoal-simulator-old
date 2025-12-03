@@ -17,5 +17,5 @@
 use crate::Vec2;
 use shipyard::Component;
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Copy, Clone)]
 pub struct Position(pub Vec2);

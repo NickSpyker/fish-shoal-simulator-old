@@ -59,6 +59,6 @@ impl RandomBehavior {
                 if rng.random_bool(cfg.stress_change_prob) {
                     stress.0 = Scalar::new_random(&mut rng, 0.1..0.5);
                 }
-            })
+            });
     }
 }

@@ -14,8 +14,26 @@
  * limitations under the License.
  */
 
-use crate::Vec2;
-use shipyard::Component;
+use crate::{Chunks, Config, Position};
+use shipyard::{EntityId, IntoIter, UniqueView, UniqueViewMut, View};
 
-#[derive(Component, Debug, Copy, Clone)]
-pub struct Velocity(pub Vec2);
+#[derive(Debug)]
+pub struct LoadChunks;
+
+impl LoadChunks {
+    pub fn system(
+        positions: View<Position>,
+        cfg: UniqueView<Config>,
+        mut chunks: UniqueViewMut<Chunks>,
+    ) {
+        chunks.clear();
+        chunks.resize(cfg.attraction_radius);
+
+        (&positions)
+            .iter()
+            .with_id()
+            .for_each(|(id, pos): (EntityId, &Position)| {
+                chunks.store(&pos.0, id.uindex() as u32);
+            });
+    }
+}

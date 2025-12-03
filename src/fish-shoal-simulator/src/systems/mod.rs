@@ -16,12 +16,16 @@
 
 mod calculate_delta_time;
 mod lerp_to_target;
+mod load_chunks;
 mod motion;
 mod out_of_bound;
 mod random_behavior;
+mod swarming;
 
 pub use calculate_delta_time::CalculateDeltaTime;
 pub use lerp_to_target::LerpToTarget;
+pub use load_chunks::LoadChunks;
 pub use motion::Motion;
 pub use out_of_bound::OutOfBound;
 pub use random_behavior::RandomBehavior;
+pub use swarming::Swarming;

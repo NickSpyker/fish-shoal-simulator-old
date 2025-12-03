@@ -56,6 +56,6 @@ impl LerpToTarget {
                 } else {
                     speed.0 = speed.0.lerp(target_speed.0, factor);
                 }
-            })
+            });
     }
 }

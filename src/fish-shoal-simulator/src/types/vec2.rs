@@ -17,6 +17,7 @@
 use rand::Rng;
 use std::{
     f32::consts::TAU,
+    fmt::{self, Display, Formatter},
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Range, Sub, SubAssign},
 };
 
@@ -98,6 +99,12 @@ impl Vec2 {
     pub fn clamp(&mut self, min: Self, max: Self) {
         self.x = self.x.clamp(min.x, max.x);
         self.y = self.y.clamp(min.y, max.y);
+    }
+}
+
+impl Display for Vec2 {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{{{}, {}}}", self.x, self.y)
     }
 }
 

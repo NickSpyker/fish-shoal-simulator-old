@@ -1387,9 +1387,7 @@ version = "0.15.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9229cfe53dfd69f0609a49f65461bd93001ea1ef889cd5529dd176593f5338a1"
 dependencies = [
- "allocator-api2",
  "foldhash 0.1.5",
- "rayon",
 ]
 
 [[package]]
@@ -1398,7 +1396,9 @@ version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
 dependencies = [
+ "allocator-api2",
  "foldhash 0.2.0",
+ "rayon",
 ]
 
 [[package]]
@@ -2609,12 +2609,11 @@ dependencies = [
 
 [[package]]
 name = "shipyard"
-version = "0.9.3"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3a45c5f393de8802e88fe0a868a8b2972ff2c8a87e0d2ab984bda9dadfb6d46"
+checksum = "3a05e6aedab341e36318f05ccd3acecd97184dbf46c4993752cb61197c3d7b31"
 dependencies = [
- "foldhash 0.1.5",
- "hashbrown 0.15.5",
+ "hashbrown 0.16.1",
  "lock_api",
  "rayon",
  "shipyard_proc",

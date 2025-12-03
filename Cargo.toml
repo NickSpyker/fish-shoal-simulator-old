@@ -32,6 +32,6 @@ fish-shoal-simulator = { path = "src/fish-shoal-simulator" }
 fish-shoal-gui = { path = "src/fish-shoal-gui" }
 rayon = { version = "1.11.0", features = [] }
 rand = { version = "0.9.2", features = [] }
-shipyard = { version = "0.9.3", features = [] }
+shipyard = { version = "0.10.0", features = ["parallel"] }
 egui = { version = "0.33.2", features = [] }
 eframe = { version = "0.33.2", features = ["default_fonts", "glow", "wayland", "x11"] }

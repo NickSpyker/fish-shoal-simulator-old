@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
+mod chunks;
 mod config;
 mod delta_time;
 
+pub use chunks::Chunks;
 pub use config::Config;
 pub use delta_time::DeltaTime;

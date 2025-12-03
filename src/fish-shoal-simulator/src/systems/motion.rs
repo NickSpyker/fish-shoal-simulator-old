@@ -34,6 +34,6 @@ impl Motion {
             .for_each(|(pos, vel, speed)| {
                 pos.0.x += vel.0.x * speed.0.value * dt;
                 pos.0.y += vel.0.y * speed.0.value * dt;
-            })
+            });
     }
 }
