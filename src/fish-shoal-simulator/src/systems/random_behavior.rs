@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{Config, Idle, Scalar, Speed, Stress, TargetSpeed, TargetVelocity, Vec2, Velocity};
+use crate::{Config, Social, Scalar, Speed, Stress, TargetSpeed, TargetVelocity, Vec2, Velocity};
 use rand::{rngs::ThreadRng, Rng};
 use rayon::prelude::*;
 use shipyard::{IntoIter, UniqueView, View, ViewMut};
@@ -29,7 +29,7 @@ impl RandomBehavior {
         speeds: View<Speed>,
         mut target_speeds: ViewMut<TargetSpeed>,
         mut stress: ViewMut<Stress>,
-        idles: View<Idle>,
+        socials: View<Social>,
         cfg: UniqueView<Config>,
     ) {
         (
@@ -38,11 +38,11 @@ impl RandomBehavior {
             &speeds,
             &mut target_speeds,
             &mut stress,
-            &idles,
+            &socials,
         )
             .par_iter()
-            .for_each(|(vel, target_vel, speed, target_speed, stress, idle)| {
-                if !idle.0 {
+            .for_each(|(vel, target_vel, speed, target_speed, stress, social)| {
+                if social.is_in_group {
                     return;
                 }
 

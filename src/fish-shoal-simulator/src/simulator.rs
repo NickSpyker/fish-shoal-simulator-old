@@ -15,7 +15,7 @@
  */
 
 use crate::{
-    entities::Fish, systems::*, Chunks, Config, DeltaTime, Error, NeighborCount, Position, SimulatorOutput,
+    entities::Fish, systems::*, Chunks, Config, DeltaTime, Error, Density, Position, SimulatorOutput,
     Speed, Velocity,
 };
 use shipyard::{
@@ -76,7 +76,7 @@ impl FishShoalSimulator {
             |positions: View<Position>,
              velocities: View<Velocity>,
              speeds: View<Speed>,
-             neighbor_counts: View<NeighborCount>| {
+             neighbor_counts: View<Density>| {
                 new_cfg = io(SimulatorOutput {
                     positions: positions.iter().map(|position| position.0.into()).collect(),
                     velocities: velocities
@@ -86,7 +86,7 @@ impl FishShoalSimulator {
                     speeds: speeds.iter().map(|speed| speed.0.value).collect(),
                     densities: neighbor_counts
                         .iter()
-                        .map(|neighbor_count| neighbor_count.0)
+                        .map(|neighbor_count| neighbor_count.value)
                         .collect(),
                 });
             },

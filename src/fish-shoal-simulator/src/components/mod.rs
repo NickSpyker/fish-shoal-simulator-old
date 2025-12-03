@@ -15,8 +15,8 @@
  */
 
 mod fish_identifier;
-mod idle;
-mod neighbor_count;
+mod social;
+mod density;
 mod position;
 mod speed;
 mod stress;
@@ -25,8 +25,8 @@ mod target_velocity;
 mod velocity;
 
 pub use fish_identifier::FishIdentifier;
-pub use idle::Idle;
-pub use neighbor_count::NeighborCount;
+pub use social::Social;
+pub use density::Density;
 pub use position::Position;
 pub use speed::Speed;
 pub use stress::Stress;

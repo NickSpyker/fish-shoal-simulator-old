@@ -17,4 +17,16 @@
 use shipyard::Component;
 
 #[derive(Component, Debug, Default)]
-pub struct Idle(pub bool);
+pub struct Social {
+    pub is_in_group: bool,
+}
+
+impl Social {
+    pub fn set_grouped(&mut self) {
+        self.is_in_group = true;
+    }
+
+    pub fn set_alone(&mut self) {
+        self.is_in_group = false;
+    }
+}

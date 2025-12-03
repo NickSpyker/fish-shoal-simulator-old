@@ -50,9 +50,9 @@ impl Default for Config {
             speed_change_prob: 0.05,
             stress_change_prob: 0.001,
 
-            attraction_radius: 10.0,
-            alignment_radius: 5.0,
-            avoidance_radius: 2.5,
+            attraction_radius: 30.0,
+            alignment_radius: 20.0,
+            avoidance_radius: 10.0,
         }
     }
 }

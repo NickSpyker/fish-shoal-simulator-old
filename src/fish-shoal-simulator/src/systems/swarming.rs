@@ -14,10 +14,24 @@
  * limitations under the License.
  */
 
-use crate::{Chunks, Config, Idle, NeighborCount, Position, TargetSpeed, TargetVelocity, Vec2};
-use rayon::prelude::*;
-use shipyard::{EntityId, Get, IntoIter, UniqueView, View, ViewMut};
+use crate::{
+    algo::SchoolingMechanism, Chunks, Density, Position, Scalar, Social, TargetSpeed, TargetVelocity,
+    Vec2,
+};
+use shipyard::{EntityId, IntoIter, UniqueView, View, ViewMut};
 use std::collections::{HashMap, HashSet};
+
+macro_rules! collect_components {
+    ($c:ident) => {
+        $c.iter().with_id().map(|(i, v)| (i, v.0)).collect()
+    };
+}
+
+macro_rules! neighbors {
+    ($o:ident, $c:ident) => {
+        $o.iter().filter_map(|&i| Some((i, *$c.get(&i)?))).collect()
+    };
+}
 
 #[derive(Debug)]
 pub struct Swarming;
@@ -27,77 +41,48 @@ impl Swarming {
         positions: View<Position>,
         mut velocities: ViewMut<TargetVelocity>,
         mut speeds: ViewMut<TargetSpeed>,
-        mut neighbor_counts: ViewMut<NeighborCount>,
-        mut idles: ViewMut<Idle>,
-        cfg: UniqueView<Config>,
+        mut densities: ViewMut<Density>,
+        mut socials: ViewMut<Social>,
         chunks: UniqueView<Chunks>,
     ) {
-        let all_velocities: HashMap<EntityId, TargetVelocity> = (&velocities)
-            .iter()
-            .with_id()
-            .map(|(id, vel)| (id, *vel))
-            .collect();
-
-        let all_speeds: HashMap<EntityId, TargetSpeed> = (&speeds)
-            .iter()
-            .with_id()
-            .map(|(id, speed)| (id, *speed))
-            .collect();
+        let others_positions: HashMap<EntityId, Vec2> = collect_components!(positions);
+        let others_velocities: HashMap<EntityId, Vec2> = collect_components!(velocities);
+        let others_speeds: HashMap<EntityId, Scalar> = collect_components!(speeds);
 
         (
             &positions,
             &mut velocities,
             &mut speeds,
-            &mut neighbor_counts,
-            &mut idles,
+            &mut densities,
+            &mut socials,
         )
-            .par_iter()
-            .for_each(|(pos, vel, speed, neighbor_count, idle)| {
-                let neighbors: HashSet<EntityId> = chunks.load(&pos.0);
-                neighbor_count.0 = neighbors.len();
-                if neighbor_count.0 == 0 {
-                    idle.0 = true;
+            .iter()
+            .with_id()
+            .for_each(|(id, (pos, vel, speed, density, social))| {
+                let mut neighbors: HashSet<EntityId> = chunks.load(&pos.0);
+                neighbors.remove(&id);
+
+                density.set(neighbors.len());
+                if density.is_zero() {
+                    social.set_alone();
                     return;
                 }
-                idle.0 = false;
+                social.set_grouped();
 
-                let neighbor_positions: HashMap<EntityId, &Position> = neighbors
-                    .par_iter()
-                    .filter_map(|&neighbor_id| {
-                        Some((neighbor_id, positions.get(neighbor_id).ok()?))
-                    })
-                    .collect();
+                let mut algo: SchoolingMechanism = SchoolingMechanism::setup(
+                    pos.0,
+                    vel.0,
+                    speed.0,
+                    neighbors!(neighbors, others_positions),
+                    neighbors!(neighbors, others_velocities),
+                    neighbors!(neighbors, others_speeds),
+                );
 
-                let mut avoidance_neighbors: Vec<(EntityId, &Position)> = neighbor_positions
-                    .iter()
-                    .filter_map(|(&neighbor_id, &neighbor_pos)| {
-                        if pos.0.distance(neighbor_pos.0) <= cfg.avoidance_radius {
-                            Some((neighbor_id, neighbor_pos))
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
+                algo.avoidance();
+                algo.alignment();
+                algo.attraction();
 
-                avoidance_neighbors.sort_unstable_by_key(|(_, neighbor_pos)| {
-                    (pos.0.distance(neighbor_pos.0) * 1000.0) as u32
-                });
-                avoidance_neighbors.truncate(6);
-
-                if !avoidance_neighbors.is_empty() {
-                    let mut avoidance_positions: Vec2 = Vec2::ZERO;
-                    for (_, neighbor_pos) in &avoidance_neighbors {
-                        avoidance_positions += neighbor_pos.0;
-                    }
-                    avoidance_positions /= avoidance_neighbors.len() as f32;
-                    let avoidance_direction: Vec2 = (pos.0 - avoidance_positions).normalized();
-                    if avoidance_direction != Vec2::ZERO {
-                        vel.0 = avoidance_direction
-                    }
-                    return;
-                }
-
-                // TODO: add alignment and attraction behavior
+                algo.set_behavior(&mut vel.0, &mut speed.0);
             });
     }
 }

@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-mod algo;
-mod components;
-mod entities;
-mod error;
-mod simulator;
-mod simulator_output;
-mod systems;
-mod types;
-mod uniques;
+use shipyard::Component;
 
-pub use components::*;
-pub use error::Error;
-pub use simulator::FishShoalSimulator;
-pub use simulator_output::SimulatorOutput;
-pub use types::*;
-pub use uniques::*;
+#[derive(Component, Debug, Default)]
+pub struct Density {
+    pub value: usize,
+}
+
+impl Density {
+    pub fn set(&mut self, value: usize) {
+        self.value = value;
+    }
+
+    pub fn is_zero(&self) -> bool {
+        self.value == 0
+    }
+}

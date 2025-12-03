@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-use shipyard::Component;
+mod schooling_mechanism;
 
-#[derive(Component, Debug, Default)]
-pub struct NeighborCount(pub usize);
+pub use schooling_mechanism::SchoolingMechanism;

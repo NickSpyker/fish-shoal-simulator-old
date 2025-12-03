@@ -15,7 +15,7 @@
  */
 
 use crate::{
-    Config, FishIdentifier, Idle, NeighborCount, Position, Scalar, Speed, Stress, TargetSpeed,
+    Config, FishIdentifier, Social, Density, Position, Scalar, Speed, Stress, TargetSpeed,
     TargetVelocity, Vec2, Velocity,
 };
 use rand::{rngs::ThreadRng, seq::SliceRandom};
@@ -41,8 +41,8 @@ impl Fish {
                 Speed(Scalar::ZERO),
                 TargetSpeed(Scalar::new_random(&mut rng, 10.0..100.0)),
                 Stress(Scalar::new(0.1)),
-                NeighborCount::default(),
-                Idle::default(),
+                Density::default(),
+                Social::default(),
             ));
         }
     }
