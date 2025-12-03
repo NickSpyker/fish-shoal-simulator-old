@@ -17,5 +17,5 @@
 use crate::Vec2;
 use shipyard::Component;
 
-#[derive(Component, Debug, Copy, Clone)]
+#[derive(Component, Debug)]
 pub struct Velocity(pub Vec2);

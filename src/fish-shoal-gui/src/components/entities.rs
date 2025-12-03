@@ -35,9 +35,10 @@ impl Entities {
         let position: [f32; 2] = data.positions[idx];
         let velocity: [f32; 2] = data.velocities[idx];
         let speed: f32 = data.speeds[idx];
+        let density: usize = data.densities[idx];
 
         let screen_pos: Pos2 = origin + Vec2::new(position[0], position[1]);
-        let color: Color32 = Utils::speed_to_color(speed);
+        let color: Color32 = Utils::density_to_color(density);
 
         if speed > 0.1 {
             let vel_vec: Vec2 = Vec2::new(velocity[0], velocity[1]);

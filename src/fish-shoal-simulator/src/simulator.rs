@@ -15,8 +15,8 @@
  */
 
 use crate::{
-    entities::Fish, systems::*, Chunks, Config, DeltaTime, Error, Position, SimulatorOutput, Speed,
-    Velocity,
+    entities::Fish, systems::*, Chunks, Config, DeltaTime, Error, NeighborCount, Position, SimulatorOutput,
+    Speed, Velocity,
 };
 use shipyard::{
     error::{AddWorkload, RunWorkload},
@@ -73,7 +73,10 @@ impl FishShoalSimulator {
         let mut new_cfg: Config = Config::default();
 
         self.world.run(
-            |positions: View<Position>, velocities: View<Velocity>, speeds: View<Speed>| {
+            |positions: View<Position>,
+             velocities: View<Velocity>,
+             speeds: View<Speed>,
+             neighbor_counts: View<NeighborCount>| {
                 new_cfg = io(SimulatorOutput {
                     positions: positions.iter().map(|position| position.0.into()).collect(),
                     velocities: velocities
@@ -81,6 +84,10 @@ impl FishShoalSimulator {
                         .map(|velocity| velocity.0.into())
                         .collect(),
                     speeds: speeds.iter().map(|speed| speed.0.value).collect(),
+                    densities: neighbor_counts
+                        .iter()
+                        .map(|neighbor_count| neighbor_count.0)
+                        .collect(),
                 });
             },
         );

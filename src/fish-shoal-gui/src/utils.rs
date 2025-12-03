@@ -19,13 +19,13 @@ use eframe::epaint::Color32;
 pub struct Utils;
 
 impl Utils {
-    pub fn speed_to_color(speed: f32) -> Color32 {
-        let s: f32 = speed.clamp(0.0, 100.0) / 100.0;
+    pub fn density_to_color(density: usize) -> Color32 {
+        let d: f32 = density.clamp(0, 6) as f32 / 6.0;
 
-        let r: u8 = (255.0 * s) as u8;
-        let g: u8 = 0u8;
-        let b: u8 = (255.0 * (1.0 - s)) as u8;
+        let r: f32 = 255.0 * d;
+        let b: f32 = 255.0 - r;
+        let g: f32 = 255.0 - (r - b).abs();
 
-        Color32::from_rgb(r, g, b)
+        Color32::from_rgb(r as u8, g as u8, b as u8)
     }
 }

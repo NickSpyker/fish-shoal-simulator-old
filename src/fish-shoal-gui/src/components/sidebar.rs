@@ -80,10 +80,10 @@ impl SideBar {
                 ui.separator();
                 ui.heading(RichText::new("Shoal behavior radius").size(14.0));
                 ui.add(
-                    Slider::new(&mut app.config.attraction_radius, 0.0..=50.0).text("Attraction"),
+                    Slider::new(&mut app.config.attraction_radius, 3.0..=50.0).text("Attraction"),
                 );
-                ui.add(Slider::new(&mut app.config.alignment_radius, 0.0..=50.0).text("Alignment"));
-                ui.add(Slider::new(&mut app.config.avoidance_radius, 0.0..=50.0).text("Avoidance"));
+                ui.add(Slider::new(&mut app.config.alignment_radius, 2.0..=50.0).text("Alignment"));
+                ui.add(Slider::new(&mut app.config.avoidance_radius, 1.0..=50.0).text("Avoidance"));
             });
     }
 }

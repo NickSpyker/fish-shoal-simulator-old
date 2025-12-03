@@ -17,5 +17,5 @@
 use crate::Scalar;
 use shipyard::Component;
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Copy, Clone)]
 pub struct TargetSpeed(pub Scalar);

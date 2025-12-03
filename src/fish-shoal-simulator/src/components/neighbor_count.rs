@@ -14,22 +14,7 @@
  * limitations under the License.
  */
 
-mod fish_identifier;
-mod idle;
-mod neighbor_count;
-mod position;
-mod speed;
-mod stress;
-mod target_speed;
-mod target_velocity;
-mod velocity;
+use shipyard::Component;
 
-pub use fish_identifier::FishIdentifier;
-pub use idle::Idle;
-pub use neighbor_count::NeighborCount;
-pub use position::Position;
-pub use speed::Speed;
-pub use stress::Stress;
-pub use target_speed::TargetSpeed;
-pub use target_velocity::TargetVelocity;
-pub use velocity::Velocity;
+#[derive(Component, Debug, Default)]
+pub struct NeighborCount(pub usize);

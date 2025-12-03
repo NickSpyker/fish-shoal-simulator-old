@@ -19,4 +19,5 @@ pub struct SimulatorOutput {
     pub positions: Vec<[f32; 2]>,
     pub velocities: Vec<[f32; 2]>,
     pub speeds: Vec<f32>,
+    pub densities: Vec<usize>,
 }
