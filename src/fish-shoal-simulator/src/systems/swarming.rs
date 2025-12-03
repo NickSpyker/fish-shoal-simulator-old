@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-use crate::{Config, Position, Speed, Velocity};
-use shipyard::{UniqueView, View, ViewMut};
+use crate::{Chunks, Config, Position, Speed, Velocity};
+use rayon::prelude::*;
+use shipyard::{EntityId, IntoIter, UniqueView, View, ViewMut};
+use std::collections::HashSet;
 
 #[derive(Debug)]
 pub struct Swarming;
@@ -26,6 +28,15 @@ impl Swarming {
         mut velocities: ViewMut<Velocity>,
         mut speeds: ViewMut<Speed>,
         cfg: UniqueView<Config>,
+        chunks: UniqueView<Chunks>,
     ) {
+        (&positions, &mut velocities, &mut speeds)
+            .par_iter()
+            .for_each(|(pos, vel, speed)| {
+                let neighbors: HashSet<EntityId> = chunks.load(&pos.0);
+                if neighbors.is_empty() {
+                    return;
+                }
+            });
     }
 }

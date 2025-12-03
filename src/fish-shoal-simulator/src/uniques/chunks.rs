@@ -65,8 +65,11 @@ impl Chunks {
 
         let mut data: HashSet<EntityId> = HashSet::new();
 
-        for dx in -1..=1 {
-            for dy in -1..=1 {
+        let x_start: i32 = if chunk_x == 0 { 0 } else { -1 };
+        let y_start: i32 = if chunk_y == 0 { 0 } else { -1 };
+
+        for dx in x_start..=1 {
+            for dy in y_start..=1 {
                 let x: u32 = (chunk_x as i32 + dx) as u32;
                 let y: u32 = (chunk_y as i32 + dy) as u32;
 
