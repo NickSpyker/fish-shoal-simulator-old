@@ -21,7 +21,7 @@ use crate::{
 use shipyard::{
     error::{AddWorkload, RunWorkload},
     Workload,
-    {IntoIter, UniqueView, UniqueViewMut, View, World},
+    {UniqueView, UniqueViewMut, View, World},
 };
 use std::{cmp::Ordering, mem};
 
@@ -78,19 +78,10 @@ impl FishShoalSimulator {
             |positions: View<Position>,
              velocities: View<Velocity>,
              speeds: View<Speed>,
-             neighbor_counts: View<Density>| {
-                new_cfg = io(SimulatorOutput {
-                    positions: positions.iter().map(|position| position.0.into()).collect(),
-                    velocities: velocities
-                        .iter()
-                        .map(|velocity| velocity.0.into())
-                        .collect(),
-                    speeds: speeds.iter().map(|speed| speed.0.value).collect(),
-                    densities: neighbor_counts
-                        .iter()
-                        .map(|neighbor_count| neighbor_count.value)
-                        .collect(),
-                });
+             densities: View<Density>| {
+                new_cfg = io(SimulatorOutput::build(
+                    positions, velocities, speeds, densities,
+                ));
             },
         );
 

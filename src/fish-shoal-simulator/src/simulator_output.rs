@@ -14,10 +14,35 @@
  * limitations under the License.
  */
 
+use crate::{Density, Position, Speed, Velocity};
+use shipyard::{IntoIter, View};
+
+macro_rules! collect_components {
+    ($view:expr, $map:expr) => {
+        $view.iter().map($map).collect()
+    };
+}
+
 #[derive(Debug, Default)]
 pub struct SimulatorOutput {
     pub positions: Vec<[f32; 2]>,
     pub velocities: Vec<[f32; 2]>,
     pub speeds: Vec<f32>,
     pub densities: Vec<usize>,
+}
+
+impl SimulatorOutput {
+    pub(crate) fn build(
+        positions: View<Position>,
+        velocities: View<Velocity>,
+        speeds: View<Speed>,
+        densities: View<Density>,
+    ) -> Self {
+        Self {
+            positions: collect_components!(positions, |pos| pos.0.into()),
+            velocities: collect_components!(velocities, |vel| vel.0.into()),
+            speeds: collect_components!(speeds, |speed| speed.0.value),
+            densities: collect_components!(densities, |density| density.value),
+        }
+    }
 }
