@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-use crate::Utils;
 use eframe::{
     egui::{Painter, Shape, Stroke},
     emath::{Pos2, Vec2},
@@ -38,7 +37,7 @@ impl Entities {
         let density: usize = data.densities[idx];
 
         let screen_pos: Pos2 = origin + Vec2::new(position[0], position[1]);
-        let color: Color32 = Utils::density_to_color(density);
+        let color: Color32 = Self::density_to_color(density);
 
         if speed > 0.1 {
             let vel_vec: Vec2 = Vec2::new(velocity[0], velocity[1]);
@@ -64,5 +63,15 @@ impl Entities {
         } else {
             painter.circle_filled(screen_pos, 2.0, color);
         }
+    }
+
+    pub fn density_to_color(density: usize) -> Color32 {
+        let d: f32 = density.clamp(0, 6) as f32 / 6.0;
+
+        let r: f32 = 255.0 * d;
+        let b: f32 = 255.0 - r;
+        let g: f32 = 255.0 - (r - b).abs();
+
+        Color32::from_rgb(r as u8, g as u8, b as u8)
     }
 }

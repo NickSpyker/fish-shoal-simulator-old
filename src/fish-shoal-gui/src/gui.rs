@@ -16,7 +16,7 @@
 
 use crate::{Error, SideBar, Simulation};
 use eframe::{
-    egui::{Context, Vec2, ViewportBuilder}, App, Frame,
+    egui::{Context, Vec2, ViewportBuilder, Visuals}, App, CreationContext, Frame,
     NativeOptions,
 };
 use fish_shoal_simulator::{Config, SimulatorOutput};
@@ -51,7 +51,10 @@ impl FishShoalGui {
                 centered: true,
                 ..Default::default()
             },
-            Box::new(|_| Ok(Box::new(self))),
+            Box::new(|cc: &CreationContext| {
+                cc.egui_ctx.set_visuals(Visuals::dark());
+                Ok(Box::new(self))
+            }),
         )
         .map_err(|err| Error::EFrame(err.to_string()))
     }

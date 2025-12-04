@@ -15,7 +15,7 @@
  */
 
 use crate::{
-    entities::Fish, systems::*, Chunks, Config, DeltaTime, Error, Density, Position, SimulatorOutput,
+    entities::Fish, systems::*, Chunks, Config, DeltaTime, Density, Error, Position, SimulatorOutput,
     Speed, Velocity,
 };
 use shipyard::{
@@ -64,7 +64,9 @@ impl FishShoalSimulator {
     where
         F: FnMut(SimulatorOutput) -> Config + 'static,
     {
-        if !self.paused {
+        if self.paused {
+            self.world.run(CalculateDeltaTime::system);
+        } else {
             self.world
                 .run_workload("sim")
                 .map_err(|err: RunWorkload| Error::Run(err.to_string()))?;
