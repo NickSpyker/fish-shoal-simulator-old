@@ -33,8 +33,6 @@ The implementation of the algorithm is based on the research document:
 
 ### App Demo
 
-![fish-shoal-simulator.gif](screenshots/fish-shoal-simulator.gif)
-
 ## License
 
 See [LICENSE-APACHE](./LICENSE-APACHE) and [LICENSE-MIT](LICENSE-MIT) for details.
