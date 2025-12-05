@@ -17,14 +17,9 @@
 use crate::{Density, Position, Speed, Velocity};
 use shipyard::{IntoIter, View};
 
-macro_rules! collect_components {
-    ($view:expr, $map:expr) => {
-        $view.iter().map($map).collect()
-    };
-}
-
 #[derive(Debug, Default)]
 pub struct SimulatorOutput {
+    pub ids: Vec<usize>,
     pub positions: Vec<[f32; 2]>,
     pub velocities: Vec<[f32; 2]>,
     pub speeds: Vec<f32>,
@@ -33,16 +28,34 @@ pub struct SimulatorOutput {
 
 impl SimulatorOutput {
     pub(crate) fn build(
-        positions: View<Position>,
-        velocities: View<Velocity>,
-        speeds: View<Speed>,
-        densities: View<Density>,
+        position_view: View<Position>,
+        velocity_view: View<Velocity>,
+        speed_view: View<Speed>,
+        density_view: View<Density>,
     ) -> Self {
+        let mut ids: Vec<usize> = Vec::new();
+        let mut positions: Vec<[f32; 2]> = Vec::new();
+        let mut velocities: Vec<[f32; 2]> = Vec::new();
+        let mut speeds: Vec<f32> = Vec::new();
+        let mut densities: Vec<usize> = Vec::new();
+
+        (&position_view, &velocity_view, &speed_view, &density_view)
+            .iter()
+            .with_id()
+            .for_each(|(id, (pos, vel, speed, density))| {
+                ids.push(id.uindex());
+                positions.push(pos.0.into());
+                velocities.push(vel.0.into());
+                speeds.push(speed.0.into());
+                densities.push(density.value);
+            });
+
         Self {
-            positions: collect_components!(positions, |pos| pos.0.into()),
-            velocities: collect_components!(velocities, |vel| vel.0.into()),
-            speeds: collect_components!(speeds, |speed| speed.0.value),
-            densities: collect_components!(densities, |density| density.value),
+            ids,
+            positions,
+            velocities,
+            speeds,
+            densities,
         }
     }
 }

@@ -82,8 +82,24 @@ impl SideBar {
                 ui.add(
                     Slider::new(&mut app.config.attraction_radius, 3.0..=50.0).text("Attraction"),
                 );
-                ui.add(Slider::new(&mut app.config.alignment_radius, 2.0..=50.0).text("Alignment"));
-                ui.add(Slider::new(&mut app.config.avoidance_radius, 1.0..=50.0).text("Avoidance"));
+                app.config.alignment_radius = app
+                    .config
+                    .alignment_radius
+                    .clamp(2.0, app.config.attraction_radius - 1.0);
+                ui.add(Slider::new(&mut app.config.alignment_radius, 2.0..=49.0).text("Alignment"));
+                app.config.avoidance_radius = app
+                    .config
+                    .avoidance_radius
+                    .clamp(1.0, app.config.alignment_radius - 1.0);
+                ui.add(Slider::new(&mut app.config.avoidance_radius, 1.0..=48.0).text("Avoidance"));
+                app.config.alignment_radius = app
+                    .config
+                    .alignment_radius
+                    .clamp(app.config.avoidance_radius + 1.0, 49.0);
+                app.config.attraction_radius = app
+                    .config
+                    .attraction_radius
+                    .clamp(app.config.alignment_radius + 1.0, 50.0);
             });
     }
 }

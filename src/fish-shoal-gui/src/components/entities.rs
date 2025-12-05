@@ -28,7 +28,7 @@ pub struct Entities;
 
 impl Entities {
     pub fn render(painter: Painter, data: SimulatorOutput, origin: Pos2) {
-        for i in 0..data.positions.len() {
+        for i in 0..data.ids.len() {
             Self::render_entity(i, &painter, &data, origin);
         }
     }

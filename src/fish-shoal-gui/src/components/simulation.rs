@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 use crate::{Entities, FishShoalGui};
 use eframe::{
     egui::{CentralPanel, Context, Painter},
@@ -21,6 +20,7 @@ use eframe::{
     epaint::{Color32, Stroke, StrokeKind},
     Frame,
 };
+use fish_shoal_simulator::SimulatorOutput;
 
 pub struct Simulation;
 
@@ -38,6 +38,10 @@ impl Simulation {
             app.config.mouse_pos = Self::get_mouse_position(ctx, area);
 
             if let Ok(output) = app.data_receiver.recv() {
+                #[cfg(debug_assertions)]
+                {
+                    Self::check_simulator_output(&output);
+                }
                 Entities::render(painter, output, area.left_top());
             }
         });
@@ -87,5 +91,15 @@ impl Simulation {
             }
         }
         None
+    }
+
+    #[cfg(debug_assertions)]
+    fn check_simulator_output(output: &SimulatorOutput) {
+        let count: usize = output.ids.len();
+
+        debug_assert_eq!(output.positions.len(), count);
+        debug_assert_eq!(output.velocities.len(), count);
+        debug_assert_eq!(output.speeds.len(), count);
+        debug_assert_eq!(output.densities.len(), count);
     }
 }
