@@ -39,18 +39,6 @@ impl Entities {
         for idx in 0..data.ids.len() {
             Self::render_entity(idx, app, primary_pressed, &painter, &data, origin);
         }
-
-        if let Some([mx, my]) = app.config.mouse_pos {
-            let pos: Pos2 = Pos2::new(mx, my);
-            if let Some([omx, omy]) = app.old_mouse_pos {
-                let old_pos: Pos2 = Pos2::new(omx, omy);
-                let vel: Vec2 = pos - old_pos;
-                let fish: Vec<Pos2> = Self::fish(pos, vel);
-                painter.add(Shape::convex_polygon(fish, Color32::RED, Stroke::NONE));
-            } else {
-                painter.circle_filled(pos, 2.0, Color32::RED);
-            };
-        }
     }
 
     fn render_entity(
