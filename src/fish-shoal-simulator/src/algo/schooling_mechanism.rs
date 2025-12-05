@@ -57,7 +57,7 @@ impl SchoolingMechanism {
         *speed = self.speed * 100.0;
     }
 
-    pub fn attraction(&mut self) -> bool {
+    pub fn avoidance(&mut self) -> bool {
         false
     }
 
@@ -65,7 +65,7 @@ impl SchoolingMechanism {
         false
     }
 
-    pub fn avoidance(&mut self) -> bool {
+    pub fn attraction(&mut self) -> bool {
         false
     }
 }
