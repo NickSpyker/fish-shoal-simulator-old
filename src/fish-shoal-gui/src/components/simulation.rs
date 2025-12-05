@@ -35,14 +35,16 @@ impl Simulation {
             let area: Rect = Self::build_area(app, rect, &painter);
             Self::build_grid(app, area, &painter);
 
+            app.old_mouse_pos = app.config.mouse_pos;
             app.config.mouse_pos = Self::get_mouse_position(ctx, area);
+            let primary_pressed: bool = ctx.input(|input| input.pointer.primary_pressed());
 
             if let Ok(output) = app.data_receiver.recv() {
                 #[cfg(debug_assertions)]
                 {
                     Self::check_simulator_output(&output);
                 }
-                Entities::render(painter, output, area.left_top());
+                Entities::render(app, primary_pressed, painter, output, area.left_top());
             }
         });
     }
@@ -86,8 +88,7 @@ impl Simulation {
     fn get_mouse_position(ctx: &Context, area: Rect) -> Option<[f32; 2]> {
         if let Some(mouse_pos) = ctx.pointer_hover_pos() {
             if area.contains(mouse_pos) {
-                let relative_pos: Vec2 = mouse_pos - area.min;
-                return Some([relative_pos.x, relative_pos.y]);
+                return Some([mouse_pos.x, mouse_pos.y]);
             }
         }
         None

@@ -16,9 +16,11 @@
 
 mod components;
 mod error;
+mod focused_fish;
 mod gui;
 
 pub use error::Error;
 pub use gui::FishShoalGui;
 
 pub(crate) use components::*;
+pub(crate) use focused_fish::{FocusedFishData, FocusedFishId};

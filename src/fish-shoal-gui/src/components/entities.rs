@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+use super::AlgoRadiusFov;
+use crate::{FishShoalGui, FocusedFishData};
 use eframe::{
     egui::{Painter, Shape, Stroke},
     emath::{Pos2, Vec2},
@@ -27,17 +29,48 @@ const FISH_HEAD_RADIUS: f32 = 3.0;
 pub struct Entities;
 
 impl Entities {
-    pub fn render(painter: Painter, data: SimulatorOutput, origin: Pos2) {
-        for i in 0..data.ids.len() {
-            Self::render_entity(i, &painter, &data, origin);
+    pub fn render(
+        app: &mut FishShoalGui,
+        primary_pressed: bool,
+        painter: Painter,
+        data: SimulatorOutput,
+        origin: Pos2,
+    ) {
+        for idx in 0..data.ids.len() {
+            Self::render_entity(idx, app, primary_pressed, &painter, &data, origin);
+        }
+
+        if let Some([mx, my]) = app.config.mouse_pos {
+            let pos: Pos2 = Pos2::new(mx, my);
+            if let Some([omx, omy]) = app.old_mouse_pos {
+                let old_pos: Pos2 = Pos2::new(omx, omy);
+                let vel: Vec2 = pos - old_pos;
+                let fish: Vec<Pos2> = Self::fish(pos, vel);
+                painter.add(Shape::convex_polygon(fish, Color32::RED, Stroke::NONE));
+            } else {
+                painter.circle_filled(pos, 2.0, Color32::RED);
+            };
         }
     }
 
-    fn render_entity(idx: usize, painter: &Painter, data: &SimulatorOutput, origin: Pos2) {
+    fn render_entity(
+        idx: usize,
+        app: &mut FishShoalGui,
+        primary_pressed: bool,
+        painter: &Painter,
+        data: &SimulatorOutput,
+        origin: Pos2,
+    ) {
+        let id: usize = data.ids[idx];
         let position: [f32; 2] = data.positions[idx];
         let velocity: [f32; 2] = data.velocities[idx];
         let density: usize = data.densities[idx];
         let speed: f32 = data.speeds[idx];
+
+        let is_focused_fish: bool = Some(id) == app.focused_fish_id;
+        if is_focused_fish {
+            app.focused_fish_data = Some(FocusedFishData::new(position, velocity, speed));
+        }
 
         let position: Pos2 = origin + Vec2::new(position[0], position[1]);
         let color: Color32 = Self::density_to_color(density);
@@ -47,7 +80,16 @@ impl Entities {
 
             let points: Vec<Pos2> = Self::fish(position, velocity);
 
+            if primary_pressed && let Some([mx, my]) = app.config.mouse_pos {
+                if position.distance(Pos2::new(mx, my)) <= FISH_LENGTH {
+                    app.focused_fish_id = Some(id);
+                }
+            }
+
             painter.add(Shape::convex_polygon(points, color, Stroke::NONE));
+            if is_focused_fish {
+                AlgoRadiusFov::render(app, position, velocity, painter, false);
+            }
         } else {
             painter.circle_filled(position, 2.0, color);
         }

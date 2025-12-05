@@ -15,6 +15,7 @@
  */
 
 use crate::{Error, SideBar, Simulation};
+use crate::{FocusedFishData, FocusedFishId};
 use eframe::{
     egui::{Context, Vec2, ViewportBuilder, Visuals}, App, CreationContext, Frame,
     NativeOptions,
@@ -27,6 +28,9 @@ pub struct FishShoalGui {
     pub config_sender: Sender<Config>,
     pub config: Config,
     pub screen: Vec2,
+    pub focused_fish_id: Option<FocusedFishId>,
+    pub focused_fish_data: Option<FocusedFishData>,
+    pub old_mouse_pos: Option<[f32; 2]>,
     initialized: bool,
 }
 
@@ -37,6 +41,9 @@ impl FishShoalGui {
             config_sender,
             config: Config::default(),
             screen: Vec2::default(),
+            focused_fish_id: None,
+            focused_fish_data: None,
+            old_mouse_pos: None,
             initialized: false,
         }
     }

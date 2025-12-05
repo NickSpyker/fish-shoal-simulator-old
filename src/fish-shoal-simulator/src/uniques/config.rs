@@ -19,6 +19,8 @@ use shipyard::Unique;
 #[derive(Unique, Debug, Copy, Clone, PartialEq)]
 pub struct Config {
     pub mouse_pos: Option<[f32; 2]>,
+    pub mouse_vel: Option<[f32; 2]>,
+    pub mouse_speed: Option<f32>,
 
     pub running: bool,
     pub paused: bool,
@@ -32,7 +34,8 @@ pub struct Config {
     pub speed_change_prob: f64,
     pub stress_change_prob: f64,
 
-    pub visual_field: f32,
+    pub attraction_fov: f32,
+    pub alignment_fov: f32,
 
     pub attraction_radius: f32,
     pub alignment_radius: f32,
@@ -43,6 +46,8 @@ impl Default for Config {
     fn default() -> Self {
         Self {
             mouse_pos: None,
+            mouse_vel: None,
+            mouse_speed: None,
 
             running: true,
             paused: false,
@@ -56,10 +61,11 @@ impl Default for Config {
             speed_change_prob: 0.05,
             stress_change_prob: 0.001,
 
-            visual_field: 150.0,
+            attraction_fov: 100.0,
+            alignment_fov: 250.0,
 
-            attraction_radius: 30.0,
-            alignment_radius: 20.0,
+            attraction_radius: 50.0,
+            alignment_radius: 30.0,
             avoidance_radius: 10.0,
         }
     }

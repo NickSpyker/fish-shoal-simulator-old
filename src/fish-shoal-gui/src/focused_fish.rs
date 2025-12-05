@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-mod algo_radius_and_fov;
-mod entities;
-mod sidebar;
-mod simulation;
+pub type FocusedFishId = usize;
 
-pub use algo_radius_and_fov::AlgoRadiusFov;
-pub use entities::Entities;
-pub use sidebar::SideBar;
-pub use simulation::Simulation;
+pub struct FocusedFishData {
+    pub position: [f32; 2],
+    pub velocity: [f32; 2],
+    pub speed: f32,
+}
+
+impl FocusedFishData {
+    pub fn new(position: [f32; 2], velocity: [f32; 2], speed: f32) -> Self {
+        Self {
+            position,
+            velocity,
+            speed,
+        }
+    }
+}

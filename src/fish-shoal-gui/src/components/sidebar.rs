@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
+use super::AlgoRadiusFov;
 use crate::FishShoalGui;
+use eframe::emath::Rect;
 use eframe::{
     egui::{Context, RichText, SidePanel, Slider},
+    emath::Vec2,
     Frame,
 };
 
@@ -28,6 +31,43 @@ impl SideBar {
             .default_width(250.0)
             .show(ctx, |ui| {
                 ui.heading("Configuration");
+
+                ui.separator();
+                ui.heading(RichText::new("Information").size(14.0));
+                let mouse_statue: String = if let Some([mx, my]) = app.config.mouse_pos {
+                    format!("{{{mx:.0}, {my:.0}}}")
+                } else {
+                    "outside".to_string()
+                };
+                ui.label(RichText::new(format!("• Mouse: {mouse_statue}")));
+                let focused_fish_id: String = if let Some(id) = app.focused_fish_id {
+                    id.to_string()
+                } else {
+                    "none".to_string()
+                };
+                ui.horizontal(|ui| {
+                    ui.label(format!("• Focused fish: {focused_fish_id}"));
+                    if app.focused_fish_id.is_some() {
+                        if ui.button("Stop").clicked() {
+                            app.focused_fish_id = None;
+                        }
+                    }
+                });
+                if let Some(fish) = &app.focused_fish_data {
+                    ui.label(format!(
+                        "    • position: {{{:.0}, {:.0}}}",
+                        fish.position[0], fish.position[1]
+                    ));
+                    ui.label(format!(
+                        "    • velocity: {{{:.2}, {:.2}}}",
+                        fish.velocity[0], fish.velocity[1]
+                    ));
+                    ui.label(format!("    • speed:    {:.0}", fish.speed));
+                } else {
+                    ui.label("    • position: none");
+                    ui.label("    • velocity: none");
+                    ui.label("    • speed:    none");
+                }
 
                 ui.separator();
                 ui.heading(RichText::new("Simulation").size(14.0));
@@ -80,26 +120,37 @@ impl SideBar {
                 ui.separator();
                 ui.heading(RichText::new("Shoal behavior radius").size(14.0));
                 ui.add(
-                    Slider::new(&mut app.config.attraction_radius, 3.0..=50.0).text("Attraction"),
+                    Slider::new(&mut app.config.attraction_radius, 3.0..=100.0).text("Attraction"),
                 );
                 app.config.alignment_radius = app
                     .config
                     .alignment_radius
                     .clamp(2.0, app.config.attraction_radius - 1.0);
-                ui.add(Slider::new(&mut app.config.alignment_radius, 2.0..=49.0).text("Alignment"));
+                ui.add(Slider::new(&mut app.config.alignment_radius, 2.0..=99.0).text("Alignment"));
                 app.config.avoidance_radius = app
                     .config
                     .avoidance_radius
                     .clamp(1.0, app.config.alignment_radius - 1.0);
-                ui.add(Slider::new(&mut app.config.avoidance_radius, 1.0..=48.0).text("Avoidance"));
+                ui.add(Slider::new(&mut app.config.avoidance_radius, 1.0..=98.0).text("Avoidance"));
                 app.config.alignment_radius = app
                     .config
                     .alignment_radius
-                    .clamp(app.config.avoidance_radius + 1.0, 49.0);
+                    .clamp(app.config.avoidance_radius + 1.0, 99.0);
                 app.config.attraction_radius = app
                     .config
                     .attraction_radius
-                    .clamp(app.config.alignment_radius + 1.0, 50.0);
+                    .clamp(app.config.alignment_radius + 1.0, 100.0);
+
+                ui.vertical(|sub_ui| {
+                    let rect: Rect = sub_ui.max_rect();
+                    AlgoRadiusFov::render(
+                        app,
+                        rect.center(),
+                        Vec2::new(0.0, -1.0),
+                        &sub_ui.painter(),
+                        true,
+                    );
+                });
             });
     }
 }
