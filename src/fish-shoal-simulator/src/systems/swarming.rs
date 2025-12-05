@@ -15,7 +15,7 @@
  */
 
 use crate::{
-    algo::{SchoolingConfig, SchoolingMechanism}, Chunks, Config, Density, Position, Scalar, Social, TargetSpeed, TargetVelocity,
+    algo::{SchoolingConfig, SchoolingMechanism}, Chunks, Config, Density, Position, Scalar, Social, Stress, TargetSpeed, TargetVelocity,
     Vec2,
 };
 use rand::rngs::ThreadRng;
@@ -42,6 +42,7 @@ impl Swarming {
         positions: View<Position>,
         mut velocities: ViewMut<TargetVelocity>,
         mut speeds: ViewMut<TargetSpeed>,
+        mut stress: ViewMut<Stress>,
         mut densities: ViewMut<Density>,
         mut socials: ViewMut<Social>,
         chunks: UniqueView<Chunks>,
@@ -57,17 +58,18 @@ impl Swarming {
             &positions,
             &mut velocities,
             &mut speeds,
+            &mut stress,
             &mut densities,
             &mut socials,
         )
             .iter()
             .with_id()
-            .for_each(|(id, (pos, vel, speed, density, social))| {
+            .for_each(|(id, (pos, vel, speed, stress, density, social))| {
                 let mut neighbors: HashSet<EntityId> = chunks.load_chunk(&pos.0);
                 neighbors.remove(&id);
 
                 density.set(neighbors.len());
-                if density.value < 6 {
+                if density.value < SchoolingMechanism::MAX_NEIGHBORS {
                     neighbors.extend(chunks.load_neighbors(&pos.0));
                 }
                 neighbors.remove(&id);
@@ -83,6 +85,7 @@ impl Swarming {
                     pos.0,
                     vel.0,
                     speed.0,
+                    stress.0,
                     neighbors!(neighbors, others_positions),
                     neighbors!(neighbors, others_velocities),
                     neighbors!(neighbors, others_speeds),
@@ -100,7 +103,7 @@ impl Swarming {
                     }
                 }
 
-                algo.set_behavior(&mut vel.0, &mut speed.0);
+                algo.set_behavior(&mut vel.0, &mut speed.0, &mut stress.0);
             });
     }
 }
