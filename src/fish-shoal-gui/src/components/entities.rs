@@ -21,6 +21,9 @@ use eframe::{
 };
 use fish_shoal_simulator::SimulatorOutput;
 
+const FISH_LENGTH: f32 = 10.0;
+const FISH_HEAD_RADIUS: f32 = 3.0;
+
 pub struct Entities;
 
 impl Entities {
@@ -41,27 +44,8 @@ impl Entities {
 
         if speed > 0.1 {
             let velocity: Vec2 = Vec2::new(velocity[0], velocity[1]);
-            let direction: Vec2 = velocity.normalized();
 
-            let right: Vec2 = Vec2::new(direction.y, -direction.x);
-
-            let head_radius: f32 = 3.0;
-            let length: f32 = 9.0;
-
-            let head_center: Pos2 = position + direction * (length * 0.2);
-            let tail_tip: Pos2 = head_center - direction * (length * 0.8);
-
-            let diag_right: Vec2 = (direction + right).normalized();
-            let diag_left: Vec2 = (direction - right).normalized();
-
-            let points: Vec<Pos2> = vec![
-                tail_tip,
-                head_center + right * head_radius,
-                head_center + diag_right * head_radius,
-                head_center + direction * head_radius,
-                head_center + diag_left * head_radius,
-                head_center - right * head_radius,
-            ];
+            let points: Vec<Pos2> = Self::fish(position, velocity);
 
             painter.add(Shape::convex_polygon(points, color, Stroke::NONE));
         } else {
@@ -69,7 +53,30 @@ impl Entities {
         }
     }
 
-    pub fn density_to_color(density: usize) -> Color32 {
+    fn fish(position: Pos2, velocity: Vec2) -> Vec<Pos2> {
+        let direction: Vec2 = velocity.normalized();
+
+        let right: Vec2 = Vec2::new(direction.y, -direction.x);
+
+        let head_center: Pos2 = position + direction * (FISH_LENGTH * 0.2);
+        let tail_tip: Pos2 = head_center - direction * (FISH_LENGTH * 0.8);
+
+        let diag_right: Vec2 = (direction + right).normalized();
+        let diag_left: Vec2 = (direction - right).normalized();
+
+        let nose_len: f32 = FISH_HEAD_RADIUS * 1.6;
+
+        vec![
+            tail_tip,
+            head_center + right * FISH_HEAD_RADIUS,
+            head_center + diag_right * FISH_HEAD_RADIUS,
+            head_center + direction * nose_len,
+            head_center + diag_left * FISH_HEAD_RADIUS,
+            head_center - right * FISH_HEAD_RADIUS,
+        ]
+    }
+
+    fn density_to_color(density: usize) -> Color32 {
         let d: f32 = density.clamp(0, 6) as f32 / 6.0;
 
         let r: f32 = 255.0 * d;
