@@ -15,8 +15,7 @@
  */
 
 use crate::{
-    algo::{SchoolingConfig, SchoolingMechanism}, Chunks, Config, /* Scalar, */ Density, Position, Social, TargetSpeed,
-    TargetVelocity,
+    algo::{SchoolingConfig, SchoolingMechanism}, Chunks, Config, Density, Position, Scalar, Social, TargetSpeed, TargetVelocity,
     Vec2,
 };
 use rand::rngs::ThreadRng;
@@ -52,7 +51,7 @@ impl Swarming {
 
         let others_positions: HashMap<EntityId, Vec2> = collect_components!(positions);
         let others_velocities: HashMap<EntityId, Vec2> = collect_components!(velocities);
-        // let others_speeds: HashMap<EntityId, Scalar> = collect_components!(speeds);
+        let others_speeds: HashMap<EntityId, Scalar> = collect_components!(speeds);
 
         (
             &positions,
@@ -64,7 +63,13 @@ impl Swarming {
             .iter()
             .with_id()
             .for_each(|(id, (pos, vel, speed, density, social))| {
-                let mut neighbors: HashSet<EntityId> = chunks.load(&pos.0);
+                let mut neighbors: HashSet<EntityId> = chunks.load_chunk(&pos.0);
+                neighbors.remove(&id);
+
+                density.set(neighbors.len());
+                if density.value < 6 {
+                    neighbors.extend(chunks.load_neighbors(&pos.0));
+                }
                 neighbors.remove(&id);
 
                 density.set(neighbors.len());
@@ -80,7 +85,7 @@ impl Swarming {
                     speed.0,
                     neighbors!(neighbors, others_positions),
                     neighbors!(neighbors, others_velocities),
-                    // neighbors!(neighbors, others_speeds),
+                    neighbors!(neighbors, others_speeds),
                     SchoolingConfig {
                         avoidance_radius: cfg.avoidance_radius,
                         alignment_radius: cfg.alignment_radius,

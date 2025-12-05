@@ -60,7 +60,17 @@ impl Chunks {
         }
     }
 
-    pub fn load(&self, pos: &Vec2) -> HashSet<EntityId> {
+    pub fn load_chunk(&self, pos: &Vec2) -> HashSet<EntityId> {
+        let id: u32 = self.chunk_id_from_pos(pos);
+
+        if let Some(chunk) = self.chunks.get(&id) {
+            return chunk.clone();
+        }
+
+        HashSet::new()
+    }
+
+    pub fn load_neighbors(&self, pos: &Vec2) -> HashSet<EntityId> {
         let (chunk_x, chunk_y): (u32, u32) = self.chunk_coords(pos);
 
         let mut data: HashSet<EntityId> = HashSet::new();
@@ -70,6 +80,10 @@ impl Chunks {
 
         for dx in x_start..=1 {
             for dy in y_start..=1 {
+                if dx == 0 && dy == 0 {
+                    continue;
+                }
+
                 let x: u32 = (chunk_x as i32 + dx) as u32;
                 let y: u32 = (chunk_y as i32 + dy) as u32;
 
@@ -186,28 +200,13 @@ mod tests {
     }
 
     #[test]
-    fn chunk_load() {
-        let chunk_size: f32 = 10.0;
-        let mut chunks_repository: Chunks = Chunks::new(chunk_size);
+    fn chunk_load_chunk() {
+        todo!()
+    }
 
-        let position_center: Vec2 = Vec2::new(15.0, 15.0);
-        let entity_center_id: EntityId = mock_id(1);
-
-        let position_neighbor: Vec2 = Vec2::new(5.0, 15.0);
-        let entity_neighbor_id: EntityId = mock_id(2);
-
-        let position_far: Vec2 = Vec2::new(45.0, 45.0);
-        let entity_far_id: EntityId = mock_id(3);
-
-        chunks_repository.store(&position_center, entity_center_id);
-        chunks_repository.store(&position_neighbor, entity_neighbor_id);
-        chunks_repository.store(&position_far, entity_far_id);
-
-        let retrieved_entities: HashSet<EntityId> = chunks_repository.load(&position_center);
-
-        assert!(retrieved_entities.contains(&entity_center_id));
-        assert!(retrieved_entities.contains(&entity_neighbor_id));
-        assert!(!retrieved_entities.contains(&entity_far_id));
+    #[test]
+    fn chunk_load_neighbors() {
+        todo!()
     }
 
     #[test]

@@ -31,7 +31,7 @@ pub struct SchoolingMechanism {
     speed: Scalar,
     others_positions: HashMap<EntityId, Vec2>,
     others_velocities: HashMap<EntityId, Vec2>,
-    // others_speeds: HashMap<EntityId, Scalar>,
+    others_speeds: HashMap<EntityId, Scalar>,
     cfg: SchoolingConfig,
 }
 
@@ -42,7 +42,7 @@ impl SchoolingMechanism {
         speed: Scalar,
         others_positions: HashMap<EntityId, Vec2>,
         others_velocities: HashMap<EntityId, Vec2>,
-        // others_speeds: HashMap<EntityId, Scalar>,
+        others_speeds: HashMap<EntityId, Scalar>,
         cfg: SchoolingConfig,
     ) -> Self {
         Self {
@@ -51,7 +51,7 @@ impl SchoolingMechanism {
             speed,
             others_positions,
             others_velocities,
-            // others_speeds,
+            others_speeds,
             cfg,
         }
     }
