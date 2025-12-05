@@ -94,7 +94,11 @@ impl Swarming {
                     },
                 );
 
-                algo.update(&mut rng);
+                if !algo.avoidance() {
+                    if !algo.alignment() {
+                        algo.attraction();
+                    }
+                }
 
                 algo.set_behavior(&mut vel.0, &mut speed.0);
             });
