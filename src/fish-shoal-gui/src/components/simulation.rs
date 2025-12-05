@@ -30,26 +30,48 @@ impl Simulation {
             let rect: Rect = ui.max_rect();
             app.screen = rect.size();
 
-            let margin_hor: f32 = (app.screen.x - app.config.width as f32) / 2.0;
-            let margin_ver: f32 = (app.screen.y - app.config.height as f32) / 2.0;
-            let top_left: Pos2 = Pos2::new(rect.min.x + margin_hor, rect.min.y + margin_ver);
-            let config_rect: Rect = Rect::from_min_size(
-                top_left,
-                Vec2::new(app.config.width as f32, app.config.height as f32),
-            );
+            let area: Rect = Self::build_area(app, rect);
 
             let painter: Painter = ui.painter_at(rect);
-
             painter.rect_stroke(
-                config_rect,
+                area,
                 0.0,
                 Stroke::new(1.0, Color32::WHITE),
                 StrokeKind::Middle,
             );
 
+            Self::build_grid(app, area, &painter);
+
             if let Ok(output) = app.data_receiver.recv() {
-                Entities::render_all(painter, output, config_rect.left_top());
+                Entities::render_all(painter, output, area.left_top());
             }
         });
+    }
+
+    fn build_area(app: &mut FishShoalGui, rect: Rect) -> Rect {
+        let margin_hor: f32 = (app.screen.x - app.config.width as f32) / 2.0;
+        let margin_ver: f32 = (app.screen.y - app.config.height as f32) / 2.0;
+
+        Rect::from_min_size(
+            Pos2::new(rect.min.x + margin_hor, rect.min.y + margin_ver),
+            Vec2::new(app.config.width as f32, app.config.height as f32),
+        )
+    }
+
+    fn build_grid(app: &mut FishShoalGui, area: Rect, painter: &Painter) {
+        let cell_size: f32 = app.config.attraction_radius;
+        let stroke: Stroke = Stroke::new(0.05, Color32::GRAY);
+
+        let mut x: f32 = area.min.x + cell_size;
+        while x < area.max.x {
+            painter.line_segment([Pos2::new(x, area.min.y), Pos2::new(x, area.max.y)], stroke);
+            x += cell_size;
+        }
+
+        let mut y: f32 = area.min.y + cell_size;
+        while y < area.max.y {
+            painter.line_segment([Pos2::new(area.min.x, y), Pos2::new(area.max.x, y)], stroke);
+            y += cell_size;
+        }
     }
 }
