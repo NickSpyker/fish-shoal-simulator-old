@@ -77,6 +77,8 @@ impl Swarming {
                 density.set(neighbors.len());
                 if density.is_zero() {
                     social.set_alone();
+                    speed.0.value = 50.0;
+                    stress.0.value = 0.1;
                     return;
                 }
                 social.set_grouped();

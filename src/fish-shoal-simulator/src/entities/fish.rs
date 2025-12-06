@@ -39,7 +39,7 @@ impl Fish {
                 Velocity(Vec2::random_dir(&mut rng)),
                 TargetVelocity(Vec2::random_dir(&mut rng)),
                 Speed(Scalar::ZERO),
-                TargetSpeed(Scalar::new_random(&mut rng, 10.0..100.0)),
+                TargetSpeed(Scalar::new_random(&mut rng, 50.0..100.0)),
                 Stress(Scalar::new(0.1)),
                 Density::default(),
                 Social::default(),

@@ -81,6 +81,7 @@ impl SchoolingMechanism {
         if position_to_avoid != Vec2::ZERO {
             self.velocity = (self.position - position_to_avoid).normalized();
             self.stress.value = 0.95;
+            self.speed.value = 100.0;
             true
         } else {
             false
@@ -88,10 +89,61 @@ impl SchoolingMechanism {
     }
 
     pub fn alignment(&mut self) -> bool {
-        false
+        let mut velocity_to_align: Vec2 = Vec2::ZERO;
+
+        let mut count: f32 = 0.0;
+        for (other_id, &other_position) in &self.others_positions {
+            if self.position.distance(other_position) <= self.cfg.avoidance_radius {
+                continue;
+            }
+            if self.position.distance(other_position) <= self.cfg.alignment_radius {
+                let other_velocity: Vec2 = self.others_velocities[other_id];
+                velocity_to_align += other_velocity;
+                count += 1.0;
+                velocity_to_align /= count;
+                if count as usize >= Self::MAX_NEIGHBORS {
+                    break;
+                }
+            }
+        }
+
+        if velocity_to_align != Vec2::ZERO {
+            self.velocity = velocity_to_align.normalized();
+            self.stress.value = 0.33;
+            self.speed.value = 75.0;
+            true
+        } else {
+            false
+        }
     }
 
     pub fn attraction(&mut self) -> bool {
-        false
+        let mut position_to_join: Vec2 = Vec2::ZERO;
+
+        let mut count: f32 = 0.0;
+        for (_, &other_position) in &self.others_positions {
+            let avoid: bool = self.position.distance(other_position) <= self.cfg.avoidance_radius;
+            let align: bool = self.position.distance(other_position) <= self.cfg.alignment_radius;
+            if avoid || align {
+                continue;
+            }
+            if self.position.distance(other_position) <= self.cfg.attraction_radius {
+                position_to_join += other_position;
+                count += 1.0;
+                position_to_join /= count;
+                if count as usize >= Self::MAX_NEIGHBORS {
+                    break;
+                }
+            }
+        }
+
+        if position_to_join != Vec2::ZERO {
+            self.velocity = (position_to_join - self.position).normalized();
+            self.stress.value = 0.5;
+            self.speed.value = 100.0;
+            true
+        } else {
+            false
+        }
     }
 }
