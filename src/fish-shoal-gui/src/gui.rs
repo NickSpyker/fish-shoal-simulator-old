@@ -16,9 +16,10 @@
 
 use crate::{Error, FocusedFishData, FocusedFishId, SideBar, Simulation};
 use eframe::{
-    egui::{Context, Vec2, ViewportBuilder, Visuals}, App, CreationContext, Frame,
+    egui::{Context, Vec2, ViewportBuilder}, App, CreationContext, Frame,
     NativeOptions,
 };
+use egui::ThemePreference;
 use fish_shoal_simulator::{Config, SimulatorOutput};
 use fish_shoal_updater::Updater;
 use std::sync::mpsc::{Receiver, Sender};
@@ -65,7 +66,8 @@ impl FishShoalGui {
                 ..Default::default()
             },
             Box::new(|cc: &CreationContext| {
-                cc.egui_ctx.set_visuals(Visuals::dark());
+                cc.egui_ctx
+                    .options_mut(|opt| opt.theme_preference = ThemePreference::Dark);
                 Ok(Box::new(self))
             }),
         )
