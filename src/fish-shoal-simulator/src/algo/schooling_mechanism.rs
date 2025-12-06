@@ -14,7 +14,6 @@
 * limitations under the License.
 */
 
-use super::SchoolingConfig;
 use crate::{Scalar, Vec2};
 use shipyard::EntityId;
 use std::collections::HashMap;
@@ -28,8 +27,10 @@ pub struct SchoolingMechanism {
     stress: Scalar,
     others_positions: HashMap<EntityId, Vec2>,
     others_velocities: HashMap<EntityId, Vec2>,
-    others_speeds: HashMap<EntityId, Scalar>,
-    cfg: SchoolingConfig,
+    // others_speeds: HashMap<EntityId, Scalar>,
+    avoidance_radius: f32,
+    alignment_radius: f32,
+    attraction_radius: f32,
 }
 
 impl SchoolingMechanism {
@@ -42,8 +43,10 @@ impl SchoolingMechanism {
         stress: Scalar,
         others_positions: HashMap<EntityId, Vec2>,
         others_velocities: HashMap<EntityId, Vec2>,
-        others_speeds: HashMap<EntityId, Scalar>,
-        cfg: SchoolingConfig,
+        // others_speeds: HashMap<EntityId, Scalar>,
+        avoidance_radius: f32,
+        alignment_radius: f32,
+        attraction_radius: f32,
     ) -> Self {
         Self {
             position,
@@ -52,8 +55,10 @@ impl SchoolingMechanism {
             stress,
             others_positions,
             others_velocities,
-            others_speeds,
-            cfg,
+            // others_speeds,
+            avoidance_radius,
+            alignment_radius,
+            attraction_radius,
         }
     }
 
@@ -68,7 +73,7 @@ impl SchoolingMechanism {
 
         let mut count: f32 = 0.0;
         for (_, &other_position) in &self.others_positions {
-            if self.position.distance(other_position) <= self.cfg.avoidance_radius {
+            if self.position.distance(other_position) <= self.avoidance_radius {
                 position_to_avoid += other_position;
                 count += 1.0;
                 position_to_avoid /= count;
@@ -93,10 +98,10 @@ impl SchoolingMechanism {
 
         let mut count: f32 = 0.0;
         for (other_id, &other_position) in &self.others_positions {
-            if self.position.distance(other_position) <= self.cfg.avoidance_radius {
+            if self.position.distance(other_position) <= self.avoidance_radius {
                 continue;
             }
-            if self.position.distance(other_position) <= self.cfg.alignment_radius {
+            if self.position.distance(other_position) <= self.alignment_radius {
                 let other_velocity: Vec2 = self.others_velocities[other_id];
                 velocity_to_align += other_velocity;
                 count += 1.0;
@@ -122,12 +127,12 @@ impl SchoolingMechanism {
 
         let mut count: f32 = 0.0;
         for (_, &other_position) in &self.others_positions {
-            let avoid: bool = self.position.distance(other_position) <= self.cfg.avoidance_radius;
-            let align: bool = self.position.distance(other_position) <= self.cfg.alignment_radius;
+            let avoid: bool = self.position.distance(other_position) <= self.avoidance_radius;
+            let align: bool = self.position.distance(other_position) <= self.alignment_radius;
             if avoid || align {
                 continue;
             }
-            if self.position.distance(other_position) <= self.cfg.attraction_radius {
+            if self.position.distance(other_position) <= self.attraction_radius {
                 position_to_join += other_position;
                 count += 1.0;
                 position_to_join /= count;

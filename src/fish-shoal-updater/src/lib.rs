@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
-mod schooling_mechanism;
+mod latest_release;
+mod operating_system;
+mod updater;
+mod version;
 
-pub use schooling_mechanism::SchoolingMechanism;
+pub(crate) use latest_release::LatestRelease;
+pub(crate) use operating_system::OperatingSystem;
+pub(crate) use version::Version;
+
+pub use updater::Updater;

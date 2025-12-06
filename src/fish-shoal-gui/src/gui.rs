@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-use crate::{Error, SideBar, Simulation};
-use crate::{FocusedFishData, FocusedFishId};
+use crate::{Error, FocusedFishData, FocusedFishId, SideBar, Simulation};
 use eframe::{
     egui::{Context, Vec2, ViewportBuilder, Visuals}, App, CreationContext, Frame,
     NativeOptions,
 };
 use fish_shoal_simulator::{Config, SimulatorOutput};
+use fish_shoal_updater::Updater;
 use std::sync::mpsc::{Receiver, Sender};
 
 pub struct FishShoalGui {
@@ -31,6 +31,9 @@ pub struct FishShoalGui {
     pub focused_fish_id: Option<FocusedFishId>,
     pub focused_fish_data: Option<FocusedFishData>,
     pub old_mouse_pos: Option<[f32; 2]>,
+    pub is_latest_version: bool,
+    pub version_msg: String,
+    pub latest_version_download_link: Option<String>,
     initialized: bool,
 }
 
@@ -44,6 +47,9 @@ impl FishShoalGui {
             focused_fish_id: None,
             focused_fish_data: None,
             old_mouse_pos: None,
+            is_latest_version: true,
+            version_msg: String::new(),
+            latest_version_download_link: None,
             initialized: false,
         }
     }
@@ -79,6 +85,12 @@ impl App for FishShoalGui {
         if !self.initialized {
             self.config.width = self.screen.x as usize;
             self.config.height = self.screen.y as usize;
+
+            if Updater::check_version(&mut self.version_msg) {
+                self.latest_version_download_link = Updater::get_latest_version_download_url();
+                self.is_latest_version = false;
+            }
+
             self.initialized = true;
         }
 

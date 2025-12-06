@@ -18,7 +18,7 @@ use super::AlgoRadiusFov;
 use crate::FishShoalGui;
 use eframe::emath::Rect;
 use eframe::{
-    egui::{Context, RichText, SidePanel, Slider},
+    egui::{Align, Context, Layout, RichText, SidePanel, Slider},
     emath::Vec2,
     Frame,
 };
@@ -163,6 +163,21 @@ impl SideBar {
                         &sub_ui.painter(),
                         true,
                     );
+                });
+
+                ui.with_layout(Layout::bottom_up(Align::Center), |ui| {
+                    ui.add_space(10.0);
+
+                    if !app.is_latest_version {
+                        if let Some(download_link) = &app.latest_version_download_link {
+                            ui.hyperlink_to(
+                                RichText::new(">> download latest <<").size(10.0),
+                                download_link,
+                            );
+                        }
+                    }
+
+                    ui.label(RichText::new(&app.version_msg).size(10.0));
                 });
             });
     }

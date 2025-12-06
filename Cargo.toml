@@ -22,7 +22,7 @@ rust-version = "1.90.0"
 
 [workspace]
 resolver = "3"
-members = ["src/fish-shoal-simulator", "src/fish-shoal-gui", "src/fish-shoal-app"]
+members = ["src/fish-shoal-simulator", "src/fish-shoal-gui", "src/fish-shoal-app", "src/fish-shoal-updater"]
 
 [profile.dev.package."*"]
 opt-level = 2
@@ -30,8 +30,12 @@ opt-level = 2
 [workspace.dependencies]
 fish-shoal-simulator = { path = "src/fish-shoal-simulator" }
 fish-shoal-gui = { path = "src/fish-shoal-gui" }
+fish-shoal-updater = { path = "src/fish-shoal-updater" }
 rayon = { version = "1.11.0", features = [] }
 rand = { version = "0.9.2", features = [] }
 shipyard = { version = "0.10.0", features = ["parallel"] }
 egui = { version = "0.33.2", features = [] }
 eframe = { version = "0.33.2", features = ["default_fonts", "glow", "wayland", "x11"] }
+dotenv_codegen = { version = "0.15.0", features = [] }
+serde = { version = "1.0.228", features = ["derive"] }
+reqwest = { version = "0.12.24", features = ["blocking", "json"] }
