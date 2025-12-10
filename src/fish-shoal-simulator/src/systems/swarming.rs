@@ -67,7 +67,7 @@ impl Swarming {
 
                 density.set(neighbors.len());
                 if density.value < SchoolingMechanism::MAX_NEIGHBORS {
-                    neighbors.extend(chunks.load_neighbors(&pos.0));
+                    neighbors.extend(chunks.load_neighbors(&cfg, &pos.0));
                 }
                 neighbors.remove(&id);
 

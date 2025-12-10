@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::Vec2;
+use crate::{Config, Vec2};
 use shipyard::{EntityId, Unique};
 use std::collections::{HashMap, HashSet};
 
@@ -70,32 +70,32 @@ impl Chunks {
         HashSet::new()
     }
 
-    pub fn load_neighbors(&self, pos: &Vec2) -> HashSet<EntityId> {
+    pub fn load_neighbors(&self, cfg: &Config, pos: &Vec2) -> HashSet<EntityId> {
         let (chunk_x, chunk_y): (u32, u32) = self.chunk_coords(pos);
 
-        let mut data: HashSet<EntityId> = HashSet::new();
+        let region_width: f32 = (cfg.width as f32 / self.chunk_size).floor();
+        let region_height: f32 = (cfg.height as f32 / self.chunk_size).floor();
 
-        let x_start: i32 = if chunk_x == 0 { 0 } else { -1 };
-        let y_start: i32 = if chunk_y == 0 { 0 } else { -1 };
+        let mut neighbors: HashSet<EntityId> = HashSet::new();
 
-        for dx in x_start..=1 {
-            for dy in y_start..=1 {
+        for dx in -1..=1 {
+            for dy in -1..=1 {
                 if dx == 0 && dy == 0 {
                     continue;
                 }
 
-                let x: u32 = (chunk_x as i32 + dx) as u32;
-                let y: u32 = (chunk_y as i32 + dy) as u32;
+                let x: f32 = (chunk_x as i32 + dx) as f32 % region_width;
+                let y: f32 = (chunk_y as i32 + dy) as f32 % region_height;
 
-                let chunk_id: u32 = Self::chunk_id_from_coords(x, y);
+                let chunk_id: u32 = Self::chunk_id_from_coords(x as u32, y as u32);
 
                 if let Some(chunk) = self.chunks.get(&chunk_id) {
-                    data.extend(chunk);
+                    neighbors.extend(chunk);
                 }
             }
         }
 
-        data
+        neighbors
     }
 
     #[inline]

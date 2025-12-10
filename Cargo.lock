@@ -1113,7 +1113,7 @@ checksum = "3a3076410a55c90011c298b04d0cfa770b00fa04e1e3c97d3f6c9de105a03844"
 
 [[package]]
 name = "fish-shoal-app"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "fish-shoal-gui",
  "fish-shoal-simulator",
@@ -1121,7 +1121,7 @@ dependencies = [
 
 [[package]]
 name = "fish-shoal-gui"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "eframe",
  "egui",
@@ -1131,7 +1131,7 @@ dependencies = [
 
 [[package]]
 name = "fish-shoal-simulator"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "rand",
  "rayon",
@@ -1140,7 +1140,7 @@ dependencies = [
 
 [[package]]
 name = "fish-shoal-updater"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "dotenv_codegen",
  "reqwest",
