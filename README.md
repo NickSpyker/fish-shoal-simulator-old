@@ -4,9 +4,9 @@
 
 ## Downloads
 
-|                                                             **Windows**                                                             |                                                           **Linux**                                                           |                                                           **MacOS**                                                           |
-|:-----------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------:|
-| [\>> Download <<](https://github.com/NickSpyker/fish-shoal-simulator-old/releases/latest/download/fish-shoal-simulator-windows.exe) | [\>> Download <<](https://github.com/NickSpyker/fish-shoal-simulator-old/releases/latest/download/fish-shoal-simulator-linux) | [\>> Download <<](https://github.com/NickSpyker/fish-shoal-simulator-old/releases/latest/download/fish-shoal-simulator-macos) |
+|                                                           **Windows**                                                           |                                                         **Linux**                                                         |                                                         **MacOS**                                                         |
+|:-------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------:|
+| [\>> Download <<](https://github.com/NickSpyker/fish-shoal-simulator/releases/latest/download/fish-shoal-simulator-windows.exe) | [\>> Download <<](https://github.com/NickSpyker/fish-shoal-simulator/releases/latest/download/fish-shoal-simulator-linux) | [\>> Download <<](https://github.com/NickSpyker/fish-shoal-simulator/releases/latest/download/fish-shoal-simulator-macos) |
 
 ### App Demo
 
